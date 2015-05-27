@@ -9,3 +9,6 @@ github_username:  fragno
 
 # Build settings
 markdown: kramdown
+
+kramdown:
+  input: GFM

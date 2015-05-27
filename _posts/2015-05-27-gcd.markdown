@@ -1,0 +1,60 @@
+---
+layout: post
+title:  "GCD技术详解"
+date:   2015-05-27 16:14:43
+categories: objective-c
+---
+
+# 背景介绍
+
+## 并发简介
+并发就是同一时间执行多个任务。可以是单核CPU上通过时间分片的方式实现，也可以是多核CPU上真正的并发执行来实现。iOS和OS X的并发编程API从低级到高级分别是pthread，NSThread，GCD，NSOperation。我们在选用的时候应该从高到低选用，保证代码并发模型的简单。
+
+## GCD简介
+GCD全称Grand Central Dispatch，其包括语言特性，运行时库以及系统级别的增强，其是在OS X 10.6以及iOS 4引入的。通过GCD能大大的提升多核iOS和OS X设备上并发代码的执行效率。
+
+使用GCD之后，就不需要和threads直接打交道了，只需要在队列中添加block就好了，GCD管理了线程池，由其根据系统资源来决定使用哪个特定线程。这样的好处在于，线程现在由中央控制，不会出现太多线程的问题，而且线程的使用也可以更有效。这种方式改变了并发编程思想，以前，我们需要面向线程来编程，而现在我们则面向队列来编程，后者要简单的多。
+
+GCD提供了**5**种不同的队列:
+
++ 主队列
+	- main queue: 运行在主线程（Thread 0）
++ 3个不同优先级的后台队列
+	- High Priority Queue
+	- Default Priority Queue
+	- Low Priority Queue
++ 更低优先级的后台队列
+	- BackGround Priority Queue，该队列有IO throtting技术（在内存较低的情况下，降低IO请求）
+
+## 为什么要有GCD
+随着多核CPU的出现，如何更好的使用多核CPU成为最主要的问题。传统的方式是创建多个线程，这种方式最大的问题是线程数不能根据核的数目的多少进行有效的伸缩。计算当前可用的核的数目对于使用thread的应用程序来说是非常困难的事情。iOS和OS X提供了足够简单的解决方案：GCD和Operation Queues。其解决思路主要是**将线程管理的代码移到系统级别，使用者只需要定义任务并将他们放到合适的队列**。
+
+分发队列分为两种：
+
++ serial dispatch queue
+	- 串行队列，每次只能执行一个任务，只有上一个任务完成了，下一个任务才能开始
++ concurrent dispatch queue
+	- 并发队列，不用等待前面的任务完成，可以尽可能多的开始任务执行
+
+dispatch queue无论是串行的还是并发的，都是遵循FIFO的，也就是都是先加入，先执行
+
+
+# BULLSHIT
+灵活性导致复杂度和责任混乱
+
++ [Low-Level Concurrency APIs](http://www.objc.io/issue-2/low-level-concurrency-apis.html)
+
+
+# 参考
+* [concurrency-apis-and-pitfalls](http://www.objc.io/issue-2/concurrency-apis-and-pitfalls.html)
+* [Grand Central Dispatch (GCD) Reference](https://developer.apple.com/library/mac/documentation/Performance/Reference/GCD_libdispatch_Ref/index.html)
+* [ConcurrencyProgrammingGuide](https://developer.apple.com/library/mac/documentation/General/Conceptual/ConcurrencyProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40008091)
+
+{% highlight smalltalk %}
+NSString *testString = [[NSString alloc] init];
+{% endhighlight %}
+
+{% highlight c %}
+int i = 0;
+print("%d\n", i);
+{% endhighlight %}
