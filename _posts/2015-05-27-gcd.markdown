@@ -68,14 +68,14 @@ queue = dispatch_queue_create("com.example.MyQueue", DISPATCH_QUEUE_CONCURRENT);
 	- 每次只能执行一个任务，只有上一个任务完成了，下一个任务才能开始
 
 {% highlight objective-c %}
-// 用户自定义并发队列
+// 用户自定义串行队列
 // OS X v10.7 before or iOS 4.3 before
 dispatch_queue_t queue;
 queue = dispatch_queue_create("com.example.MyQueue", NULL);
 {% endhighlight %}
 
 {% highlight objective-c %}
-// 用户自定义并发队列
+// 用户自定义串行队列
 // OS X v10.7 and later or iOS 4.3 and later
 #define DISPATCH_QUEUE_SERIAL 
 #define DISPATCH_QUEUE_CONCURRENT
@@ -119,11 +119,3 @@ cocoa operations是采用面向对象的方式封装异步任务。他们可以�
 * [Grand Central Dispatch (GCD) Reference](https://developer.apple.com/library/mac/documentation/Performance/Reference/GCD_libdispatch_Ref/index.html)
 * [ConcurrencyProgrammingGuide](https://developer.apple.com/library/mac/documentation/General/Conceptual/ConcurrencyProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40008091)
 
-{% highlight smalltalk %}
-NSString *testString = [[NSString alloc] init];
-{% endhighlight %}
-
-{% highlight c %}
-int i = 0;
-print("%d\n", i);
-{% endhighlight %}
