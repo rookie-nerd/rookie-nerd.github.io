@@ -13,26 +13,26 @@ categories: objective-c
 
 iOS和OS X的并发编程API从低级到高级分别是pthread，NSThread，GCD，NSOperation。我们在选用的时候应该从高到低选用，保证代码并发模型的简单。
 
-
-
 ## GCD简介
 
-GCD全称Grand Central Dispatch，其包括语言特性，运行时库以及系统级别的增强，其是在OS X 10.6以及iOS 4引入的。通过GCD能大大的提升多核iOS和OS X设备上并发代码的执行效率。
+GCD全称Grand Central Dispatch，由语言特性，运行时库以及系统级别的增强等组成，其是在OS X 10.6以及iOS 4引入的。通过GCD能大大的提升多核iOS和OS X设备上并发代码的执行效率。
 
 使用GCD之后，就不需要和threads直接打交道了，只需要在队列中添加block就好了，GCD管理了线程池，由其根据系统资源来决定使用哪个特定线程。这样的好处在于，线程现在由中央控制，不会出现太多线程的问题，而且线程的使用也可以更有效。
 
 这种方式改变了并发编程思想，以前，我们需要面向线程来编程，而现在我们则面向队列来编程。面向队列编程只需要关注任务的设计，而不用再考虑线程的创建和管理，明显要简单的多。
 
-
-### 为什么要有GCD
+## 为什么要有GCD
 
 随着多核CPU的出现，如何更好的使用多核CPU成为最主要的问题。传统的方式是创建多个线程，这种方式最大的问题是线程数不能根据核的数目的多少进行有效的伸缩。计算当前可用的核的数目对于使用thread的应用程序来说是非常困难的事情。
 
 iOS和OS X提供了足够简单的解决方案：GCD和Operation Queues。其解决思路主要是**将线程管理的代码移到系统级别，使用者只需要定义任务并将他们放到合适的队列**。
 
+<br>
 
-### Dispatch Queues
+# GCD组成
+GCD是苹果的并发解决方案，可以从以下四个方面对GCD进行详细的阐述，其API也主要是这四个方面的，参考 [Grand Central Dispatch (GCD) Reference](https://developer.apple.com/library/mac/documentation/Performance/Reference/GCD_libdispatch_Ref/index.html)。
 
+## Dispatch Queues
 GCD提供了**3**种不同的队列:
 
 + 主队列
@@ -42,13 +42,12 @@ GCD提供了**3**种不同的队列:
 	- 不用等待前面的任务完成，可以尽可能多的开始任务执行
 	- GCD提供了4中全局并发队列
 	- 用户自定义并发队列
-
 {% highlight objective-c %}
 // GCD提供的4中全局并发队列
-#define DISPATCH_QUEUE_PRIORITY_HIGH        2
-#define DISPATCH_QUEUE_PRIORITY_DEFAULT     0
-#define DISPATCH_QUEUE_PRIORITY_LOW         (-2)
-#define DISPATCH_QUEUE_PRIORITY_BACKGROUND  INT16_MIN
+ #define DISPATCH_QUEUE_PRIORITY_HIGH        2
+ #define DISPATCH_QUEUE_PRIORITY_DEFAULT     0
+ #define DISPATCH_QUEUE_PRIORITY_LOW         (-2)
+ #define DISPATCH_QUEUE_PRIORITY_BACKGROUND  INT16_MIN
 
 dispatch_queue_t aQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 {% endhighlight %}
@@ -56,9 +55,9 @@ dispatch_queue_t aQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFA
 {% highlight objective-c %}
 // 用户自定义并发队列
 // OS X v10.7 and later or iOS 4.3 and later
-#define DISPATCH_QUEUE_SERIAL 
-#define DISPATCH_QUEUE_CONCURRENT
-
+ #define DISPATCH_QUEUE_SERIAL 
+ #define DISPATCH_QUEUE_CONCURRENT
+	
 dispatch_queue_t queue;
 queue = dispatch_queue_create("com.example.MyQueue", DISPATCH_QUEUE_CONCURRENT);
 {% endhighlight %}	
@@ -77,45 +76,73 @@ queue = dispatch_queue_create("com.example.MyQueue", NULL);
 {% highlight objective-c %}
 // 用户自定义串行队列
 // OS X v10.7 and later or iOS 4.3 and later
-#define DISPATCH_QUEUE_SERIAL 
-#define DISPATCH_QUEUE_CONCURRENT
+ #define DISPATCH_QUEUE_SERIAL 
+ #define DISPATCH_QUEUE_CONCURRENT
 
 dispatch_queue_t queue;
 queue = dispatch_queue_create("com.example.MyQueue", DISPATCH_QUEUE_SERIAL);
 {% endhighlight %}
 
-### Dispatch groups
-
+## Dispatch groups
 dispatch groups提供了一种同步机制，可以实现某个任务的执行依赖于其他任务的完成。
+{% highlight objective-c %}
+dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
+dispatch_group_t group = dispatch_group_create();
 
+// add a task to group
+dispatch_group_async(group, queue, ^{
+	//Some asynchronous work
+});
 
-### Dispatch semaphores
+// Do some other work while the tasks execute
 
+// When you cannnot make any more forward progress
+// wait on the group to block the current thread
+dispatch_group_wait(group, DISPATCH_TIME_FOREVER);
+
+// Release the group when it is no longer needed
+dispatch_release(group)
+
+{% endhighlight %}
+
+## Dispatch Semaphores
 dispatch semaphore类似于传统的信号量，作用也类似。
 
+## Dispatch Sources
+dispatch source是一种基本的数据类型，GCD支持以下类型的dispatch sources
 
-### Dispatch Sources
++ Timer dispatch source：产生周期性的通知
++ Signal dispatch source：UNIX信号通知
++ Descriptor source：文件或者socket操作通知
++ Process dispatch source：进程相关事件通知
++ Mach port dispatch source：Mach相关事件通知
++ Custom dispatch sourceno：自定义并触发的通知
 
 
+<br>
 
+# 代码实践
+下面用于记录gcd各种实用的使用
 
-# BULLSHIT
+<br>
+
+# TODO
 灵活性导致复杂度和责任混乱
 
 + [Low-Level Concurrency APIs](http://www.objc.io/issue-2/low-level-concurrency-apis.html)
 
 
+<br>
 
 # 其他
 
 ## Operation Queues
 cocoa operations是采用面向对象的方式封装异步任务。他们可以自己执行，也可以结合operation queue来执行。关于操作队列详细信息请参考[Operation Queues](https://developer.apple.com/library/mac/documentation/General/Conceptual/ConcurrencyProgrammingGuide/OperationObjects/OperationObjects.html)。
 
-
+<br>
 
 # 参考
 
 * [concurrency-apis-and-pitfalls](http://www.objc.io/issue-2/concurrency-apis-and-pitfalls.html)
 * [Grand Central Dispatch (GCD) Reference](https://developer.apple.com/library/mac/documentation/Performance/Reference/GCD_libdispatch_Ref/index.html)
 * [ConcurrencyProgrammingGuide](https://developer.apple.com/library/mac/documentation/General/Conceptual/ConcurrencyProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40008091)
-
