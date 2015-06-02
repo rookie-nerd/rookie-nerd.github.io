@@ -1,0 +1,25 @@
+---
+layout: post
+title: "iOS编程规范实践"
+date: 2015-06-02 14:42:46
+categories: objective-c
+---
+
+# 代码结构
+
++ 善用@class
+
+{% highlight objective-c %}
+
+// example.h
+
+@class Item;
+
+@interface Example : NSObject
+@property Item* item;
+@end
+
+@interface Item : NSObject
+@property NSString *string;
+@end
+{% endhighlight %}

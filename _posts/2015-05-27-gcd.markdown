@@ -124,6 +124,19 @@ dispatch source是一种基本的数据类型，GCD支持以下类型的dispatch
 # 代码实践
 下面用于记录gcd各种实用的使用
 
++ singleton
+{% highlight objective-c %}
++ (instancetype)sharedInstance
+{
+    static dispatch_once_t once;
+    static id sharedInstance;
+    dispatch_once(&once, ^{
+        sharedInstance = [[self alloc] init];
+    });
+    return sharedInstance;
+}
+{% endhighlight %}
+
 <br>
 
 # TODO
