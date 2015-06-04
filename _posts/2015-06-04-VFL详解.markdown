@@ -52,7 +52,7 @@ p.pos_absolute {
 
 
 ## Android
-[Common Layouts](http://developer.android.com/guide/topics/ui/declaring-layout.html#CommonLayouts)
+android的通用布局主要是以下三种。[Common Layouts](http://developer.android.com/guide/topics/ui/declaring-layout.html#CommonLayouts)
 
 + 线性布局
 以单一横向或者纵向组织子元素的方式。
@@ -64,6 +64,19 @@ p.pos_absolute {
 展示web页面
 
 
+## iOS
+iOS的出身比较奇怪，因为其早期机型确定，不存在很多适配的问题，随着iPhone 6以及iPhone 6 Plus的出现，适配也变成了一个项目的必要考量。iOS 6以后，适配主要依赖Auto Layout。Auto Layout类似于相对布局，设置元素之间的关系，后面的章节会对Auto Layout有比较详细的介绍。下面就将各个平台相对布局的属性进行简单的比较。
+
+
+## FlexBox
+为什么这里要放FlexBox，因为大家都说好，其只在更有效的进行布局。[A Complete Guide to Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+According to Chris Coyier:
+"The main idea behind the flex layout is to give the container the ability to alter its items' width/height (and order) to best fill the available space..."
+
+
+## 对比
+通过比较Web、Android以及iOS的布局可以发现，其实最主要的布局就只有一种方式：相对布局。其他的布局方式或者基于相对布局，或者不具备通用性。而且相对布局非常符合人类常规思维。一般人类在描述布局的时候都会使用相对布局的方法，比如，该物品左边30cm等。
+
 
 # Auto Layout
 [Auto Layout Guide](https://developer.apple.com/library/ios/documentation/UserExperience/Conceptual/AutolayoutPG/AutoLayoutConcepts/AutoLayoutConcepts.html#//apple_ref/doc/uid/TP40010853-CH14-SW1)
@@ -74,4 +87,7 @@ Auto Layout的基本构造块是constraint（约束）。可以将约束认为�
 
 约束有其他属性：Constant value、Relation、Priority level
 
+Intrinsic Content Size
+
+Auto Layout负责控制器、视图之间的布局。
 
