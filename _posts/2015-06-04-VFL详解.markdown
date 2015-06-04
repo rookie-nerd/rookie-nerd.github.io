@@ -1,0 +1,77 @@
+---
+layout: post
+title: VFL详解
+date: 2015-06-04 12:53:58
+categories: objective-c
+---
+
+# 布局
+
+客户端开发都会遇到布局的问题，无论是web、iOS还是Android，只要涉及到用户界面的，都会和布局打交道。web、iOS和Android现在都有一套自己的布局方式，那他们之间有什么共同之处，布局是不是应该具有某种意义上的共通呢？
+
+## web
+
+web端布局主要依赖CSS，下面就简单看看web是如何布局的。 [CSS Positioning](http://www.w3schools.com/css/css_positioning.asp)、[學習 CSS 版面配置](http://zh-tw.learnlayout.com/)
+
++ 正常布局
+{% highlight css %}
+p.static {
+	position: static;
+}
+{% endhighlight %}
+照着浏览器预设的配置，自动排版在页面上
+
++ 固定布局
+{% highlight css %}
+p.pos_fixed {
+	position: fixed;
+	top: 30px;
+	right: 5px;
+}
+{% endhighlight %}
+相对于浏览器视窗来定位
+
++ 相对布局
+{% highlight css %}
+p.pos_relative {
+	position: relative;
+	left: -20px
+}
+{% endhighlight %}
+和static表现一样，但可以添加额外的属性，top、right、bottom、left来相对的调整其本该出现的位置，但不会影响其他元素的位置。
+
++ 绝对布局
+{% highlight css %}
+p.pos_absolute {
+	position: absolute;
+	left: 100px;
+	top: 150px;
+}
+{% endhighlight %}
+该元素的位置相对于其第一个父元素的位置，如果没有的话，就是<html>
+
+
+## Android
+[Common Layouts](http://developer.android.com/guide/topics/ui/declaring-layout.html#CommonLayouts)
+
++ 线性布局
+以单一横向或者纵向组织子元素的方式。
+
++ 相对布局
+允许自定义子元素之间位置的方式，例如：子元素A在子元素B的左边，子元素A和父元素顶部对齐等
+
++ Web View
+展示web页面
+
+
+
+# Auto Layout
+[Auto Layout Guide](https://developer.apple.com/library/ios/documentation/UserExperience/Conceptual/AutolayoutPG/AutoLayoutConcepts/AutoLayoutConcepts.html#//apple_ref/doc/uid/TP40010853-CH14-SW1)
+
+Auto Layout的基本构造块是constraint（约束）。可以将约束认为是人类表达布局的数学表达。举个例子：该按钮的左边缘在其容器左边缘20points <=> button.left = container.left + 20.
+
+属性可以有：left、right、top、bottom、leading、trailing、width、height、centerX、centerY以及baseline
+
+约束有其他属性：Constant value、Relation、Priority level
+
+
