@@ -69,7 +69,7 @@ iOS的出身比较奇怪，因为其早期机型确定，不存在很多适配�
 
 
 ## FlexBox
-为什么这里要放FlexBox，因为大家都说好，其只在更有效的进行布局。[A Complete Guide to Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
+为什么这里要放FlexBox，因为大家都说好，其旨在更有效的进行布局。[A Complete Guide to Flexbox](https://css-tricks.com/snippets/css/a-guide-to-flexbox/)
 According to Chris Coyier:
 "The main idea behind the flex layout is to give the container the ability to alter its items' width/height (and order) to best fill the available space..."
 
