@@ -76,7 +76,7 @@ According to Chris Coyier:
 
 ## 对比
 通过比较Web、Android以及iOS的布局可以发现，其实最主要的布局就只有一种方式：相对布局。其他的布局方式或者基于相对布局，或者不具备通用性。而且相对布局非常符合人类常规思维。一般人类在描述布局的时候都会使用相对布局的方法，比如，该物品左边30cm等。
-
+下面我们进行简单的对比。
 
 # Auto Layout
 [Auto Layout Guide](https://developer.apple.com/library/ios/documentation/UserExperience/Conceptual/AutolayoutPG/AutoLayoutConcepts/AutoLayoutConcepts.html#//apple_ref/doc/uid/TP40010853-CH14-SW1)
