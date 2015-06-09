@@ -13,7 +13,7 @@ categories: linux shell
 date +"%Y-%m-%d %H:%M:%S"
 #output: 2015-06-02 14:45:53
 
-// MAC
+# MAC
 date -r 1426163387 +"%Y-%m-%d"
 #output: 2015-03-12
 {% endhighlight %}
