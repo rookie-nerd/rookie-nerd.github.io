@@ -11,7 +11,7 @@ categories: objective-c
 
 讲GCD就必须讲并发，因为GCD就是为并发而生的。并发就是同一时间执行多个任务。可以是单核CPU上通过时间分片的方式实现，也可以是多核CPU上真正的并发执行来实现。
 
-iOS和OS X的并发编程API从低级到高级分别是pthread，NSThread，GCD，NSOperation。我们在选用的时候应该从高到低选用，保证代码并发模型的简单。
+iOS和OS X的并发编程API从低级到高级分别是pthread，NSThread，GCD，NSOperation。我们在选用的时候应该从高到低选用，保证代码并发模型的简单。**灵活性导致复杂度和责任混乱**,越低级的代码使用起来越灵活，但相应的对使用者的要求也越高。
 
 ## GCD简介
 
@@ -137,13 +137,62 @@ dispatch source是一种基本的数据类型，GCD支持以下类型的dispatch
 }
 {% endhighlight %}
 
-<br>
++ 保护资源
+{% highlight objective-c %}
+- (void)setCount: (NSUInteger)count forKey:(NSString *)key
+{
+	key = [key copy];
+	dispatch_async(self.isolationQueue, ^(){
+		if(count == 0) {
+			[self.counts removeObjectForKey:key];
+		}else{
+			self.counts[key] = @(count);
+		}
+	}); 
+}
 
-# TODO
-灵活性导致复杂度和责任混乱
+- (NSUInteger)countForKey:(NSString *)key
+{
+	__block NSUInteger count;
+	dispatch_sync(self.isolationQueue, ^(){
+		NSNumber *n = self.counts[key];
+		count = [n unsignedIntegerValue];
+	});
 
-+ [Low-Level Concurrency APIs](http://www.objc.io/issue-2/low-level-concurrency-apis.html)
+	return count;
+}
+{% endhighlight %}
+这样self.count就不会有并发问题了。self.isolationQueue是串行queue
 
++ 一个资源，多读少写
+{% highlight objective-c %}
+// 创建并发queue
+self.isolationQueue = dispatch_queue_create([label UTF8String], DISPATCH_QUEUE_CONCURRENT);
+
+- (void)setCount:(NSUInteger)count forKey:(NSString *)key
+{
+	key = [key copy];
+	// 屏障函数，实现资源保护
+	dispatch_barrier_async(self.isolationQueue, ^(){
+		if(count == 0) {
+			[self.counts removeObjectForKey: key];
+		}else{
+			self.counts[key] = @(count);
+		}
+	});
+}
+
+- (NSUInteger)countForKey:(NSString *)key
+{
+	__block NSUInteger count;
+	dispatch_sync(self.isolationQueue, ^(){
+		NSNumber *n = self.counts[key];
+		count = [n unsignedIntegerValue];
+	});
+
+	return count;
+}
+{% endhighlight %}
 
 <br>
 
@@ -159,3 +208,4 @@ cocoa operations是采用面向对象的方式封装异步任务。他们可以�
 * [concurrency-apis-and-pitfalls](http://www.objc.io/issue-2/concurrency-apis-and-pitfalls.html)
 * [Grand Central Dispatch (GCD) Reference](https://developer.apple.com/library/mac/documentation/Performance/Reference/GCD_libdispatch_Ref/index.html)
 * [ConcurrencyProgrammingGuide](https://developer.apple.com/library/mac/documentation/General/Conceptual/ConcurrencyProgrammingGuide/Introduction/Introduction.html#//apple_ref/doc/uid/TP40008091)
+* [Low-Level Concurrency APIs](http://www.objc.io/issue-2/low-level-concurrency-apis.html)
