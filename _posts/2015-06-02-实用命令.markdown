@@ -53,4 +53,5 @@ svn propset svn:ignore "first
 svn changelist sub sub.c sub.h
 svn cl --remove sub.c
 svn diff --cl sub
+svn ci --changelist sub -m "sub"
 {% endhighlight %}
