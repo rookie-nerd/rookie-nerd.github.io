@@ -48,4 +48,9 @@ svn pg -R svn:ignore .
 svn propset svn:ignore "first
  second
  third" .
+
+# 指定文件提交
+svn changelist sub sub.c sub.h
+svn cl --remove sub.c
+svn diff --cl sub
 {% endhighlight %}
