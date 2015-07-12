@@ -23,3 +23,8 @@ categories: objective-c
 @property NSString *string;
 @end
 {% endhighlight %}
+
+# 通知
++ 通知的NSString放在.h文件中，让使用者知道通知的存在
++ 少用通知，通知会让行为变得不可控
+
