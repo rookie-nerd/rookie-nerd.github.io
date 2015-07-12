@@ -13,7 +13,7 @@ categories: linux shell svn
 date +"%Y-%m-%d %H:%M:%S"
 #output: 2015-06-02 14:45:53
 
-# mac
+#mac
 date -r 1426163387 +"%Y-%m-%d"
 #output: 2015-03-12
 {% endhighlight %}
@@ -21,12 +21,22 @@ date -r 1426163387 +"%Y-%m-%d"
 
 ## 在命令行打开相应的程序
 {% highlight sh %}
-# mac
+#mac
 open .  # 使用finder打开当前目录
 open -a Xcode *.xcodeproj # 使用特定的程序打开文件
 
 {% endhighlight %}
 
+
+## 流编辑器，sed
+{% highlight sh %}
+#linux
+sed -i 's/old_link/new_link/g' *
+
+#mac
+sed -i '.original' 's/old_link/new_link/g' * 	// -i 后面必须指定备份的后缀名
+sed -i '' 's/old_link/new_link/g' *				// -i 后面如果是空的话，表明忽略后缀名
+{% endhighlight %}
 
 # svn
 
@@ -38,4 +48,10 @@ svn pg -R svn:ignore .
 svn propset svn:ignore "first
  second
  third" .
+
+# 指定文件提交
+svn changelist sub sub.c sub.h
+svn cl --remove sub.c
+svn diff --cl sub
+svn ci --changelist sub -m "sub"
 {% endhighlight %}
