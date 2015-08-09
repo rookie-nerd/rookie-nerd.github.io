@@ -80,7 +80,6 @@ mac客户端使用的是Tunnelblick[https://tunnelblick.net/]
 
 首先需要从vpn server下把 /usr/share/doc/openvpn/examples/sample-keys下的ca.crt、client.crt、client.key拷贝到/Users/fragno/Desktop/Tunnelblick VPN 配置样/目录下，然后修改配置文件
 {% highlight sh %}
-
 proto tcp
 
 # 修改成自己的vpn server地址
