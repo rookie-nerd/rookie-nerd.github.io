@@ -41,7 +41,8 @@ sudo apt-get install openvpn
 {% highlight sh %}
 # 将examples目录下得keys拷贝到/etc/openvpn/keys目录下
 cd /etc/openvpn
-mv /usr/share/doc/openvpn/examples /usr/share/doc/openvpn/examples/sample-keys
+mkdir keys
+cp -r /usr/share/doc/openvpn/examples/sample-keys keys/
 
 # 解压缩server.conf.gz
 gunzip –c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz > server.conf
