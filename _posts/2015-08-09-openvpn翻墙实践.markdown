@@ -47,7 +47,7 @@ cp -r /usr/share/doc/openvpn/examples/sample-keys keys/
 # 解压缩server.conf.gz
 gunzip –c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz > server.conf
 
-# 修改server.conf                                                                  
+# 修改server.conf
 local 0.0.0.0
 
 # 笔者用udp不能通过验证，具体原因未详，后续有结论继续更新
@@ -70,7 +70,7 @@ client-to-client
 
 3. 启动openvpn
 {% highlight sh %}
-openvpn /etc/openpvn/server.conf 
+openvpn /etc/openpvn/server.conf
 # 启动后注意观察terminal的输出，没有error就说明启动成功了
 {% endhighlight %}
 
@@ -102,29 +102,29 @@ PKI的原理有点类似我们身份证的发行机构，身份证发行机构�
 #### easy-rsa
 easy-rsa是CLI工具，用来创建和管理PKI CA的。github上的使用说明太过通用，以下使用主要参考了[openvpn 服务端的安装(easy-rsa3)](http://blog.csdn.net/orangleliu/article/details/43157955)
 
-{% highlight sh %} 
+{% highlight sh %}
 # 以下以~/目录为例。目录在哪里是没有关系的
 cd ~ && git clone https://github.com/OpenVPN/easy-rsa.git
 mv easy-rsa easy-rsa-server
 cp -rf easy-rsa-server easy-rsa-client
 
 # 生成客户端的req
-cd ~/easy-rsa-client/easyrsa3/  
-cp vars.example vars  					#一般情况下，默认的配置可以满足需求，也可以根据需要修改  
-./easyrsa init-pki  
+cd ~/easy-rsa-client/easyrsa3/
+cp vars.example vars  					#一般情况下，默认的配置可以满足需求，也可以根据需要修改
+./easyrsa init-pki
 ./easyrsa gen-req rookienerd 			#用自己的名字，需要创建一个密码  和 cn name，自己用的 需要记住，记住不能使用client，否则后面注册会有问题
 
 
 # 生成服务端的ca
-cd ~/easy-rsa-server/easyrsa3/ 
-cp vars.example vars  					#一般情况下，默认的配置可以满足需求，也可以根据需要修改  
-./easyrsa init-pki   					#建立一个空的pki结构，生成一系列的文件和目录  
-./easyrsa build-ca   					#创建ca  密码 和 cn那么需要记住  
-./easyrsa gen-req server nopass  		#创建服务端证书  common name 最好不要跟前面的cn那么一样  
-./easyrsa sign server server   			#签约服务端证书  
+cd ~/easy-rsa-server/easyrsa3/
+cp vars.example vars  					#一般情况下，默认的配置可以满足需求，也可以根据需要修改
+./easyrsa init-pki   					#建立一个空的pki结构，生成一系列的文件和目录
+./easyrsa build-ca   					#创建ca  密码 和 cn那么需要记住
+./easyrsa gen-req server nopass  		#创建服务端证书  common name 最好不要跟前面的cn那么一样
+./easyrsa sign server server   			#签约服务端证书
 ./easyrsa gen-dh  						#创建Diffie-Hellman
 
-./easyrsa import-req ~/easy-rsa-client/easyrsa3/pki/reqs/rookienerd.req rookienerd  #导入req  
+./easyrsa import-req ~/easy-rsa-client/easyrsa3/pki/reqs/rookienerd.req rookienerd  #导入req
 ./easyrsa sign client rookienerd #用户签约，根据提示输入服务端的ca密码
 
 # 这样我们就有了我们所需要的全部的文件，将他们分别拷贝到server和client端即可
@@ -144,6 +144,10 @@ service openvpn start
 
 ### 修改端口
 不要使用默认的1194端口，改成任何比较大的端口都可以
+
+
+## 路由配置
+TODO
 
 
 
