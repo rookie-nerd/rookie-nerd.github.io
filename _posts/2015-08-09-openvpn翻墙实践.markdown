@@ -18,7 +18,7 @@ vpn的全称叫virtual private network，虚拟专用网络，即利用公网架
 4. 通过调整ip转发来优化vpnsever
 
 ## 国外vps或者其他可以访问的机器
-本文作者使用的是[digitalocean](http://www.digitalocean.com/)，速度不能说很优秀，但是稳定够用。这个vps还有个最大的问题是，其官网需要翻墙访问（--！），所以首次使用的用户谨慎选择。
+本文作者使用的是[digitalocean](http://www.digitalocean.com/)，速度不能说很优秀，但是稳定够用。这个vps还有个最大的问题是，其官网需要翻墙访问（dead lock），所以首次使用的用户谨慎选择。
 
 ## 搭建vpnserver
 该步骤是整个过程中最复杂的部分，下面我们就一步一步来搭建。vpn server选用的openvpn，开源免费。若本文有说的不清楚的地方，请参考[HOWTO](https://openvpn.net/index.php/open-source/documentation/howto.html#quick)
