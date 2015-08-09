@@ -47,9 +47,11 @@ cp -r /usr/share/doc/openvpn/examples/sample-keys keys/
 # 解压缩server.conf.gz
 gunzip –c /usr/share/doc/openvpn/examples/sample-config-files/server.conf.gz > server.conf
 
-# 修改server.conf
-                                                                      
+# 修改server.conf                                                                  
 local 0.0.0.0
+
+# 笔者用udp不能通过验证，具体原因未详，后续有结论继续更新
+proto tcp
 
 ca /etc/openvpn/keys/ca.crt
 cert /etc/openvpn/keys/server.crt
@@ -76,15 +78,17 @@ openvpn /etc/openpvn/server.conf
 mac客户端使用的是Tunnelblick[https://tunnelblick.net/]
 安装完后会弹一个sample的配置文件，和server的几乎一模一样，
 
-首先需要从vpn server下把 /usr/share/doc/openvpn/examples/sample-keys下的ca.crt、client.crt、client.key拷贝到/Users/fragno/Desktop/Tunnelblick VPN 配置样目录下，然后修改配置文件
+首先需要从vpn server下把 /usr/share/doc/openvpn/examples/sample-keys下的ca.crt、client.crt、client.key拷贝到/Users/fragno/Desktop/Tunnelblick VPN 配置样/目录下，然后修改配置文件
 {% highlight sh %}
+
+proto tcp
+
 # 修改成自己的vpn server地址
 remote xxx.xxx.xxx.xxx 1194
 {% endhighlight %}
 
 修改文件夹后缀为tblk，然后双击后点击右上角的tunnelblick的连接即可，在vpn server的terminal上可以看到有log，连接成功的话就会有很多成功log，注意观察。
 
-注意：笔者这里使用udp是不能认证成功的，可能网络太差了，把udp换成tcp即可连接成功。连接成功后就算是测试通过了。
 **测试成功并不代表可以使用了，如果使用测试的配置进行vpn翻墙，危险是非常大的，下面的工作才是真正创建属于我们自己的vpn的工作**
 
 
