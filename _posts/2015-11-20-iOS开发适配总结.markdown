@@ -17,10 +17,12 @@ categories: objective-c
 控件位置一般都不能给绝对的位置，需要给到相对位置，那么如何给到相对位置呢？
 
 ![iPhone 6P 相对位置示例1](/img/iphone6p_position.png)
+
 参考上图，因为在iOS开发中(0,0)坐标是在屏幕的左上角，因此这个位置是绝对的。当我们要确定一个控件的位置时，可以依赖这个锚点，利用好iOS设备屏幕的上下左右边缘进行标注，如上图所示。
 
 以上是相对于屏幕的相对位置，其实相对于其他元素的相对位置也是一样的，一旦我们如上确定了一个元素，那这个元素的位置就固定了，接下来，我们就可以将这个元素作为锚点来决定我们另外的元素的位置。
 ![iPhone 6P 相对位置示例2](/img/iphone6p_position1.png)
+
 **所以，在我们进行布局的时候，一定要有非常良好的层次感，在iOS中叫View Hierarchy，找准相对的位置，这样才能更好的进行布局。**
 
 ## 控件大小
@@ -40,12 +42,12 @@ categories: objective-c
 
 这里假设我们的设计稿是以iPhone6为基准设计的，那如下的宏定义可以用于适配不同的机型。
 ```smalltalk
-    \#define WidthRatio SCREEN_WIDTH/375
-    \#define HeightRatio SCREEN_HEIGHT/667
-    \#define AdaptWidth(width) width*WidthRatio
-    \#define AdaptHeight(height) height*HeightRatio
+    #define WidthRatio SCREEN_WIDTH/375
+    #define HeightRatio SCREEN_HEIGHT/667
+    #define AdaptWidth(width) width*WidthRatio
+    #define AdaptHeight(height) height*HeightRatio
 ```
-对所有的标注值，比如与屏幕边缘的距离、控件的高度等，都需要进行等比例的变化，以下图片展示了等比例变换之后的效果。下图是使用了该宏和不使用该宏的效果，请大家自行品鉴。
+对所有的标注值，比如与屏幕边缘的距离、控件的高度等，都需要进行等比例的变化，以下图片展示了等比例变换之后的效果。下图是使用了该宏和不使用该宏的效果，请大家自行品鉴，红色是使用了适配，灰色是没有使用适配，大家可以重点看看整体的布局。
 ![标注值适配和没适配的效果比较](/img/adapt.png)
 
 
