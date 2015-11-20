@@ -9,6 +9,7 @@ categories: objective-c
 因为iOS设备多样性越来越多，因此在布局中要尽量要相对布局，保证适配性。
 
 一个控件要在手机上显示，包括两方面的信息
+
 + 控件大小
 + 控件位置
 
@@ -20,6 +21,7 @@ categories: objective-c
 ![Alt text](/img/iphone6p_position.png)
 
 # iOS设备尺寸
+
 | Device | iPhone 4 | iPhone 5 | iPhone 6 | iPhone 6+ |
 | ------ | -------- | -------- | -------- | --------- |
 |   px   | 640x960  | 640x1136 | 750x1334 | 1080x1920 |
