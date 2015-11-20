@@ -18,7 +18,7 @@ categories: objective-c
 
 ## 控件位置
 控件位置一般都不能给绝对的位置，需要给到相对位置，如下图
-![Alt text](/img/iphone6p_position.png)
+![Alt text](/img/iphone6p_position.png =100)
 
 # iOS设备尺寸
 
