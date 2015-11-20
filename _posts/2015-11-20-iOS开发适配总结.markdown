@@ -17,8 +17,8 @@ categories: objective-c
 那么在不同的尺寸的屏幕上，究竟应该如何决定控件的大小呢？
 
 ## 控件位置
-控件位置一般都不能给绝对的位置，需要给到相对位置，如下图
-![Alt text](/img/iphone6p_position.png)
+控件位置一般都不能给绝对的位置，需要给到相对位置，那么如何给到相对位置呢
+![iPhone 6P 相对位置示例](/img/iphone6p_position.png)
 
 # iOS设备尺寸
 
