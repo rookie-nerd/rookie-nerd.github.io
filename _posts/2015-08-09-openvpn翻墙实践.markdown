@@ -134,7 +134,7 @@ cp ~/easy-rsa-server/easyrsa3/dh.pem  /etc/openvpn/keys/dh1024.pem
 cp ~/easy-rsa-server/easyrsa3/issued/server.crt /etc/openpvn/keys/server.crt
 cp ~/easy-rsa-server/easyrsa3/private/server.key /etc/openvpn/keys/server.key
 
-# 拷贝到client端，这里client需要拷贝的文件包括ca.crt、rookienerd.crt、rookienerd.key(在~/easy-rsa-client/easyrsa3/private/目录下)
+# 拷贝到client端，这里client需要拷贝的文件包括ca.crt、rookienerd.crt、rookienerd.key(在~/easy-rsa-client/easyrsa3/pki/private/目录下)
 # 注意如果不改配置的话，需要将名字换成client.crt和client.key，然后重启服务端，重启client就ok了。
 
 service openvpn start
