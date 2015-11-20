@@ -11,7 +11,9 @@ categories: objective-c
 
 ## web
 
-web端布局主要依赖CSS，下面就简单看看web是如何布局的。 [CSS Positioning](http://www.w3schools.com/css/css_positioning.asp)、[學習 CSS 版面配置](http://zh-tw.learnlayout.com/)
+web端布局主要依赖CSS，下面就简单看看web是如何布局的。
+[CSS Positioning](http://www.w3schools.com/css/css_positioning.asp)
+[學習 CSS 版面配置](http://zh-tw.learnlayout.com/)
 
 + 正常布局
 {% highlight css %}
