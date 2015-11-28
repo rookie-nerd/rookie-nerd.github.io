@@ -11,6 +11,7 @@ categories: objective-c
 系统在app crash的时候会生成crash log，crash log在真机上的位置一般为：**/private/var/mobile/Library/Logs/CrashReporter/**。
 如下是一个实际的crashlog。[crashLog结构解析](http://www.raywenderlich.com/23704/demystifying-ios-application-crash-logs)
 
+```asm
 // 1: 进程信息
 Incident Identifier: 1AB014C6-C27B-41A6-A776-ADEEE093BDBC           // 唯一的ID用来标识该crash
 CrashReporter Key:   017e3ec4eb64f18c3e59100a9656b01232afa7d4       // 映射到设备标识的唯一key，如果你发现所有的crash都来自于相同或者相当少的key，那就不必太担心
@@ -107,14 +108,18 @@ Binary Images:
 0x26752000 - 0x26764fff libvMisc.dylib armv7s  <9cc618389310324caa99bba4cee6b56e> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvMisc.dylib
 0x26765000 - 0x26765fff vecLib armv7s  <6f2f59c102323ed0b1559f7523fcf7a5> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/vecLib
 0x26766000 - 0x2678dfff Accounts armv7s  <ed90e206502e3b8194d1376d49c5ba45> /System/Library/Frameworks/Accounts.framework/Accounts
+```
+
 
 # 0x29000数字之谜
 相信仔细看完上面的这个crashlog例子，大家对crashlog就不会感到那么陌生了。我们正要信心满满准备搞定crash的时候，仔细一看，才发现Thread 18给的crash信息在最关键的位置给打了码。这是为什么呢？为什么系统不将这些关键信息公之于众呢？要想搞明白这个问题，就需要弄明白AFWealth这个二进制文件是怎么生成的了。
 
 学过C++的同学都知道，从编写源代码到生成可执行文件，中间需要经过以下几步，并辅以简单的hello world来说明。相关知识，[符号表](https://en.wikipedia.org/wiki/Symbol_table)
+```xml
 源程序     ->              编译           ->                 链接                 -> 可执行文件
 hello.cpp                              hello.o                                      hello
 (ASCII c program text)                 (Mach-O 64-bit object x86\_64)              (Mach-O 64-bit executable x86\_64)
+```
 
 编译生成的hello.o是一个object文件，**每个object文件都有自己的一张符号表，里面包含了所有外部可见的变量、函数等的标识符**，这样在链接的时候，链接器就会根据符号表去解析未解析的符号，否则就会链接失败，报undefined symbol错误。
 + 符号表可能仅仅存在编译链接过程，完成之后就被丢弃了（大部分发布的二进制文件都是不包含符号表的），
