@@ -1,0 +1,247 @@
+---
+layout: post
+title: iOS crash符号化
+date: 2015.11.28
+categories: objective-c
+---
+
+# crashLog相关介绍
+作为iOS开发工程师，不遇到crash是不可能，而造成crash的原因又是多种多样，包括但不限于读写错误地址，执行非法指令，越权访问等等。一般系统在crash的会记录crash时的线程栈，方便开发者查明crash的原因。
+
+系统在app crash的时候会生成crash log，crash log在真机上的位置一般为：**/private/var/mobile/Library/Logs/CrashReporter/**。
+如下是一个实际的crashlog。[crashLog结构解析](http://www.raywenderlich.com/23704/demystifying-ios-application-crash-logs)
+
+// 1: 进程信息
+Incident Identifier: 1AB014C6-C27B-41A6-A776-ADEEE093BDBC           // 唯一的ID用来标识该crash
+CrashReporter Key:   017e3ec4eb64f18c3e59100a9656b01232afa7d4       // 映射到设备标识的唯一key，如果你发现所有的crash都来自于相同或者相当少的key，那就不必太担心
+Hardware Model:      iPhone5,3                                      // 设备类型，对应可参考[model对应机型](https://www.theiphonewiki.com/wiki/Models)
+Process:             AFWealth [2764]                                // 应用名字，中括号里是crash时候的pid
+Path:                /private/var/mobile/Containers/Bundle/Application/FDEEBADC-71CB-4A64-A80E-AB30486877C9/AFWealth.app/AFWealth // 应用在手机中的路径
+Identifier:          com.antfortune.wealthrc                        // 应用Bundle Id
+Version:             0.9.0.080302 (0.9.0)                           // 版本号
+Code Type:           ARM (Native)                                   // 代码类型
+Parent Process:      launchd [1]                                    // 父进程
+
+// 基本信息
+Date/Time:           2015-08-05 09:49:56.810 +0800                  // crash发生的时间
+Launch Time:         2015-08-05 09:48:54.482 +0800                  // app启动的时间
+OS Version:          iOS 8.4 (12H143)                               // iOS版本
+Report Version:      105                                        
+
+// 异常信息
+Exception Type:  EXC_CRASH (SIGABRT)                                // 异常类型
+Exception Codes: 0x0000000000000000, 0x0000000000000000             // 异常码，这里有几个常见的异常码，比如0x8badf00d->watchDog超时；0xdead10cc->deadlock，死循环啦；0xdeadfa11->用户强制退出等等
+Triggered by Thread:  18                                            // 异常发生的线程
+
+// 线程堆栈
+Thread 0 name:  Dispatch queue: com.apple.main-thread
+Thread 0:
+
+frame号    库名字                          函数调用地址          函数地址起始行数        + 执行到的行数
+0         libsystem_kernel.dylib          0x3641f5a4          syscall_thread_switch + 8
+。。。。。。。
+
+Thread 18 name:  Dispatch queue: com.apple.root.default-qos         // 这就是crash线程
+Thread 18 Crashed:
+0   libsystem_kernel.dylib          0x36432df0 __pthread_kill + 8
+1   libsystem_pthread.dylib         0x364b1cc2 pthread_kill + 58
+2   libsystem_c.dylib               0x363ce904 abort + 72
+3   libsystem_malloc.dylib          0x364633aa szone_error + 330
+4   libsystem_malloc.dylib          0x36463654 free_list_checksum_botch + 24
+5   libsystem_malloc.dylib          0x3645b3fe tiny_malloc_from_free_list + 1022
+6   libsystem_malloc.dylib          0x36459eb6 szone_malloc_should_clear + 218
+7   libsystem_malloc.dylib          0x3645d3fe malloc_zone_calloc + 90
+8   libsystem_malloc.dylib          0x3645d38e calloc + 46
+9   CoreFoundation                  0x2746f952 __rehashd + 22
+10  CoreFoundation                  0x2738ea08 -[__NSDictionaryM setObject:forKey:] + 696
+11  CoreFoundation                  0x27396da8 -[NSMutableDictionary addEntriesFromDictionary:] + 240
+12  AFWealth                        0x0014a238 0x29000 + 1184312
+13  AFWealth                        0x0014a312 0x29000 + 1184530
+14  AFWealth                        0x0014a584 0x29000 + 1185156
+15  Foundation                      0x281401f2 _decodeObjectBinary + 3042
+16  Foundation                      0x2813f500 _decodeObject + 272
+17  Foundation                      0x2813e8f2 +[NSKeyedUnarchiver unarchiveObjectWithData:] + 78
+18  AFWealth                        0x0003089e 0x29000 + 30878
+19  AFWealth                        0x0033f240 0x29000 + 3236416
+20  AFWealth                        0x0033f1d4 0x29000 + 3236308
+21  AFWealth                        0x0033cf6e 0x29000 + 3227502
+22  AFWealth                        0x0035f92c 0x29000 + 3369260
+23  AFWealth                        0x0035f8d4 0x29000 + 3369172
+24  AFWealth                        0x0020573a 0x29000 + 1951546
+25  AFWealth                        0x00204ea8 0x29000 + 1949352
+26  libdispatch.dylib               0x363472e0 _dispatch_call_block_and_release + 8
+27  libdispatch.dylib               0x3635137c _dispatch_root_queue_drain + 1384
+28  libdispatch.dylib               0x363523be _dispatch_worker_thread3 + 90
+29  libsystem_pthread.dylib         0x364aedbe _pthread_wqthread + 666
+30  libsystem_pthread.dylib         0x364aeb10 start_wqthread + 4
+
+。。。。。。。
+
+// 寄存器状态
+Thread 18 crashed with ARM Thread State (32-bit):
+    r0: 0x00000000    r1: 0x00000000      r2: 0x00000000      r3: 0x0000004d
+    r4: 0x00000006    r5: 0x0612d000      r6: 0x1574a854      r7: 0x0612c6f0
+    r8: 0x00000001    r9: 0x364698b6     r10: 0x01186000     r11: 0x36469ac7
+    ip: 0x00000148    sp: 0x0612c6e4      lr: 0x364b1cc7      pc: 0x36432df0 （注意这里和crash的线程正在执行的地址是一样的，因为pc寄存器保存的就是程序执行的位置）
+  cpsr: 0x00000010
+
+
+// 加载的二进制文件
+Binary Images:
+// AFWealth二进制文件加载的代码段位置是0x29000到0x94fff,其architecture是armv7，其UUID是**路径中的FDEEBADC-71CB-4A64-A80E-AB30486877C9**，注意！这里给我们解析crash log带来了很大的作用。
+0x29000 - 0xd94fff AFWealth armv7  <166c5b9ea8cb381b930542bbaf3b979a> /var/mobile/Containers/Bundle/Application/FDEEBADC-71CB-4A64-A80E-AB30486877C9/AFWealth.app/AFWealth
+
+// 以下是app运行所需要的所有的二进制文件
+0x1fef8000 - 0x1ff1bfff dyld armv7s  <89c8b5de05ef310e9c399d3abd699990> /usr/lib/dyld
+0x25a6c000 - 0x25a74fff AccessibilitySettingsLoader armv7s  <3ec2fd59cf1b3fb3832682498708136a> /System/Library/AccessibilityBundles/AccessibilitySettingsLoader.bundle/AccessibilitySettingsLoader
+0x25cbf000 - 0x25dacfff RawCamera armv7s  <33b93bce28763ae881ac6156b1a070fe> /System/Library/CoreServices/RawCamera.bundle/RawCamera
+0x25dc3000 - 0x25ed7fff IMGSGX543RC2GLDriver armv7s  <74afd60322403a43b03eadb4f7dfaa7d> /System/Library/Extensions/IMGSGX543RC2GLDriver.bundle/IMGSGX543RC2GLDriver
+0x25ee3000 - 0x26050fff AVFoundation armv7s  <194a49546fc93e0d804440a70c033fa4> /System/Library/Frameworks/AVFoundation.framework/AVFoundation
+0x26051000 - 0x260b0fff libAVFAudio.dylib armv7s  <1d4dcaa02bd3375397daf4ffa2cf24cf> /System/Library/Frameworks/AVFoundation.framework/libAVFAudio.dylib
+0x260ea000 - 0x260eafff Accelerate armv7s  <2c29c5379fe43440b43aff96d73855ae> /System/Library/Frameworks/Accelerate.framework/Accelerate
+0x260fb000 - 0x26316fff vImage armv7s  <603d854d418a39559bdfb5ec78b509bd> /System/Library/Frameworks/Accelerate.framework/Frameworks/vImage.framework/vImage
+0x26317000 - 0x263fdfff libBLAS.dylib armv7s  <0834c18b8b2435bc9a1a0b9019ab2c7c> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libBLAS.dylib
+0x263fe000 - 0x266c2fff libLAPACK.dylib armv7s  <417a0b8d8dd636d499919893aeb6c258> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libLAPACK.dylib
+0x266c3000 - 0x266d4fff libLinearAlgebra.dylib armv7s  <ab870bd429bb32808ed43ee4d77b8637> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libLinearAlgebra.dylib
+0x266d5000 - 0x26751fff libvDSP.dylib armv7s  <3599c8eb992c302a9573108f9d7cb1b7> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvDSP.dylib
+0x26752000 - 0x26764fff libvMisc.dylib armv7s  <9cc618389310324caa99bba4cee6b56e> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/libvMisc.dylib
+0x26765000 - 0x26765fff vecLib armv7s  <6f2f59c102323ed0b1559f7523fcf7a5> /System/Library/Frameworks/Accelerate.framework/Frameworks/vecLib.framework/vecLib
+0x26766000 - 0x2678dfff Accounts armv7s  <ed90e206502e3b8194d1376d49c5ba45> /System/Library/Frameworks/Accounts.framework/Accounts
+
+# 0x29000数字之谜
+相信仔细看完上面的这个crashlog例子，大家对crashlog就不会感到那么陌生了。我们正要信心满满准备搞定crash的时候，仔细一看，才发现Thread 18给的crash信息在最关键的位置给打了码。这是为什么呢？为什么系统不将这些关键信息公之于众呢？要想搞明白这个问题，就需要弄明白AFWealth这个二进制文件是怎么生成的了。
+
+学过C++的同学都知道，从编写源代码到生成可执行文件，中间需要经过以下几步，并辅以简单的hello world来说明。相关知识，[符号表](https://en.wikipedia.org/wiki/Symbol_table)
+源程序     ->              编译           ->                 链接                 -> 可执行文件
+hello.cpp                              hello.o                                      hello
+(ASCII c program text)                 (Mach-O 64-bit object x86\_64)              (Mach-O 64-bit executable x86\_64)
+
+编译生成的hello.o是一个object文件，**每个object文件都有自己的一张符号表，里面包含了所有外部可见的变量、函数等的标识符**，这样在链接的时候，链接器就会根据符号表去解析未解析的符号，否则就会链接失败，报undefined symbol错误。
++ 符号表可能仅仅存在编译链接过程，完成之后就被丢弃了（大部分发布的二进制文件都是不包含符号表的），
++ 也可能打在二进制文件里面，以便后期再用(比如我们调试的时候)，
++ 也有可能用单独的bundle来存符号表（.dSYM文件）
+
+这里说到的**符号表**就是我们解开0x29000的关键所在，符号表对二进制文件中的指令和源代码中的符号做了映射，使得我们能够从二进制文件的指令中还原我们能看的懂的代码。
+
+
+光说不练假把式，那我们继续已上面的hello为例，说明其中的关系。按照下面的步骤进行我们的试验。
+1、已debug模式编译包
+```C++
+g++ -g hello.cpp           // 生成a.out可执行文件和a.out.dSYM符号表文件
+```
+
+使用nm看a.out的符号表。[nm工具](https://sourceware.org/binutils/docs-2.17/binutils/nm.html#nm)
+```asm
+0000000100001e0c s GCC_except_table2
+0000000100001e4c s GCC_except_table3
+0000000100001efc s GCC_except_table5
+                 U __Unwind_Resume
+                 U __ZNKSt3__16locale9use_facetERNS0_2idE
+                 U __ZNKSt3__18ios_base6getlocEv
+0000000100001cb0 t __ZNSt3__111char_traitsIcE11eq_int_typeEii
+0000000100001cd0 t __ZNSt3__111char_traitsIcE3eofEv
+00000001000015d0 t __ZNSt3__111char_traitsIcE6lengthEPKc
+                 U __ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6__initEmc
+                 U __ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED1Ev
+                 U __ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE3putEc
+                 U __ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE5flushEv
+                 U __ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentryC1ERS3_
+                 U __ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentryD1Ev
+00000001000015f0 t __ZNSt3__116__pad_and_outputIcNS_11char_traitsIcEEEENS_19ostreambuf_iteratorIT_T0_EES6_PKS4_S8_S8_RNS_8ios_baseES4_
+0000000100001150 t __ZNSt3__124__put_character_sequenceIcNS_11char_traitsIcEEEERNS_13basic_ostreamIT_T0_EES7_PKS4_m
+                 U __ZNSt3__14coutE
+0000000100001040 t __ZNSt3__14endlIcNS_11char_traitsIcEEEERNS_13basic_ostreamIT_T0_EES7_
+                 U __ZNSt3__15ctypeIcE2idE
+                 U __ZNSt3__16localeD1Ev
+                 U __ZNSt3__18ios_base33__set_badbit_and_consider_rethrowEv
+                 U __ZNSt3__18ios_base5clearEj
+0000000100000ff0 t __ZNSt3__1lsINS_11char_traitsIcEEEERNS_13basic_ostreamIcT_EES6_PKc
+                 U __ZSt9terminatev
+0000000100001c90 t ___clang_call_terminate
+                 U ___cxa_begin_catch
+                 U ___cxa_end_catch
+                 U ___gxx_personality_v0
+0000000100000000 T __mh_execute_header
+0000000100000fa0 T _main
+                 U _strlen
+                 U dyld_stub_binder
+```
+
+2、使用strip移除符号
+```C++
+cp a.out a.stripped.out         // 拷贝a.out，使用strip生成符号表被缩减过的二进制文件
+strip a.stripped.out
+```
+
+使用nm查看符号表
+```asm
+                 U __Unwind_Resume
+                 U __ZNKSt3__16locale9use_facetERNS0_2idE
+                 U __ZNKSt3__18ios_base6getlocEv
+0000000100001cb0 t __ZNSt3__111char_traitsIcE11eq_int_typeEii
+0000000100001cd0 t __ZNSt3__111char_traitsIcE3eofEv
+00000001000015d0 t __ZNSt3__111char_traitsIcE6lengthEPKc
+                 U __ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEE6__initEmc
+                 U __ZNSt3__112basic_stringIcNS_11char_traitsIcEENS_9allocatorIcEEED1Ev
+                 U __ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE3putEc
+                 U __ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE5flushEv
+                 U __ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentryC1ERS3_
+                 U __ZNSt3__113basic_ostreamIcNS_11char_traitsIcEEE6sentryD1Ev
+0000000100001150 t __ZNSt3__124__put_character_sequenceIcNS_11char_traitsIcEEEERNS_13basic_ostreamIT_T0_EES7_PKS4_m
+                 U __ZNSt3__14coutE
+                 U __ZNSt3__15ctypeIcE2idE
+                 U __ZNSt3__16localeD1Ev
+                 U __ZNSt3__18ios_base33__set_badbit_and_consider_rethrowEv
+                 U __ZNSt3__18ios_base5clearEj
+0000000100000ff0 t __ZNSt3__1lsINS_11char_traitsIcEEEERNS_13basic_ostreamIcT_EES6_PKc
+                 U __ZSt9terminatev
+                 U ___cxa_begin_catch
+                 U ___cxa_end_catch
+                 U ___gxx_personality_v0
+0000000100000000 T __mh_execute_header
+                 U _strlen
+                 U dyld_stub_binder
+```
+仔细观察两者的差别，可以发现strip之后，a.out文件变小了，而其中很多符号也被移除了，比如\_main,GCC_except_table2等。
+
+3、使用lldb加载二进制 [lldb](http://lldb.llvm.org/symbolication.html)
+lldb是下一代的高性能调试器，使用lldb可以帮助我们调试和验证。
+
+```shell
+target create --no-dependents --arch x86_64 a.out   #创建目标a.out
+image list                                          #查看加载的二进制文件
+
+ # sample output
+ #[  0] D081A049-722D-39D9-A9E8-4B1D79BA0AEB 0x0000000100000000 /Users/fragno/Program/cpptest/a.out 
+ #      /Users/fragno/Program/cpptest/a.out.dSYM/Contents/Resources/DWARF/a.out
+
+image load --file a.out __TEXT 0                    #加载image到内存中，并且把TEXT段的其实地址设为0
+
+image lookup -a 0xfa0                               #比如我们要查看0000000100000fa0地址处的代码是什么，就可以这样查看
+ # sample output
+ # Address: a.out\[0x0000000100000fa0\] \(a.out.__TEXT.__text + 0\)
+ #     Summary: a.out`main at hello.cpp:8
+```
+
+是不是很神奇，我们发现，这样我们找出来的符号是main，而a.out的符号表中main对应的地址也正好是0x0000000100000fa0！
+
+好了，以上就是解密crash的全部原理了，那么说了那么多，我们拿到crashlog之后，怎么样才能解出我们想要的log呢？下面部分就简单的介绍下实战方案。
+
+
+
+
+# Further Reading
++ https://developer.apple.com/library/ios/technotes/tn2151/_index.html
+
+
+
+
+
+
+
+
+
+
+
+
+
