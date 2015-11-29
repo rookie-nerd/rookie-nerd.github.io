@@ -141,7 +141,7 @@ hello.cpp                              hello.o                                  
 g++ -g hello.cpp           // 生成a.out可执行文件和a.out.dSYM符号表文件
 ```
 
-使用nm看a.out的符号表。[nm工具](https://sourceware.org/binutils/docs-2.17/binutils/nm.html#nm)
+使用nm看a.out的符号表。([nm工具](https://sourceware.org/binutils/docs-2.17/binutils/nm.html#nm))
 ```asm
 0000000100001e0c s GCC_except_table2
 0000000100001e4c s GCC_except_table3
@@ -184,7 +184,7 @@ cp a.out a.stripped.out         // 拷贝a.out，使用strip生成符号表被�
 strip a.stripped.out
 ```
 
-使用nm查看符号表
+使用nm查看a.stripped.out符号表
 ```asm
                  U __Unwind_Resume
                  U __ZNKSt3__16locale9use_facetERNS0_2idE
@@ -213,7 +213,7 @@ strip a.stripped.out
                  U _strlen
                  U dyld_stub_binder
 ```
-仔细观察两者的差别，可以发现strip之后，a.out文件变小了，而其中很多符号也被移除了，比如\_main,GCC_except_table2等。一般正式发布的二进制都会将将符号表strip，以便减少安装包的大小。
+仔细观察两者的差别，可以发现strip之后，a.stripped.out文件比a.out笑了，其中很多符号被移除了，比如\_main,GCC_except_table2等。一般正式发布的二进制都会将将符号表strip，以便减少安装包的大小。
 
 3、使用lldb加载二进制 [lldb](http://lldb.llvm.org/symbolication.html)
 lldb是下一代的高性能调试器，使用lldb可以帮助我们调试和验证。
@@ -226,9 +226,9 @@ image list                                          #查看加载的二进制文
  #[  0] D081A049-722D-39D9-A9E8-4B1D79BA0AEB 0x0000000100000000 /Users/xxuser/Program/cpptest/a.out 
  #      /Users/xxuser/Program/cpptest/a.out.dSYM/Contents/Resources/DWARF/a.out
 
-image load --file a.out __TEXT 0                    #加载image到内存中，并且把TEXT段的其实地址设为0
+image load --file a.out __TEXT 0                    #加载image到内存中，并且把TEXT段的起始地址设为0
 
-image lookup -a 0xfa0                               #比如我们要查看0000000100000fa0地址处的代码是什么，就可以这样查看
+image lookup -a 0xfa0                               #比如我们要查看0000000100000fa0地址处的代码是什么，就可以这样查看，注意这里使用了偏移地址
  # sample output
  # Address: a.out[0x0000000100000fa0]  (a.out.__TEXT.__text + 0)
  #     Summary: a.out`main at hello.cpp:8
