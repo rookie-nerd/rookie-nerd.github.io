@@ -18,8 +18,8 @@ categories: objective-c
 Incident Identifier: 1AB014C6-C27B-41A6-A776-ADEEE093BDBC           // 唯一的ID用来标识该crash
 CrashReporter Key:   017e3ec4eb64f18c3e59100a9656b01232afa7d4       // 映射到设备标识的唯一key，如果你发现所有的crash都来自于相同或者相当少的key，那就不必太担心
 Hardware Model:      iPhone5,3                                      // 设备类型，对应可参考[model对应机型](https://www.theiphonewiki.com/wiki/Models)
-Process:             AFWealth [2764]                                // 应用名字，中括号里是crash时候的pid
-Path:                /private/var/mobile/Containers/Bundle/Application/FDEEBADC-71CB-4A64-A80E-AB30486877C9/AFWealth.app/AFWealth // 应用在手机中的路径
+Process:             SampleApp [2764]                                // 应用名字，中括号里是crash时候的pid
+Path:                /private/var/mobile/Containers/Bundle/Application/FDEEBADC-71CB-4A64-A80E-AB30486877C9/SampleApp.app/SampleApp // 应用在手机中的路径
 Identifier:          com.antfortune.wealthrc                        // 应用Bundle Id
 Version:             0.9.0.080302 (0.9.0)                           // 版本号
 Code Type:           ARM (Native)                                   // 代码类型
@@ -58,20 +58,20 @@ Thread 18 Crashed:
 9   CoreFoundation                  0x2746f952 __rehashd + 22
 10  CoreFoundation                  0x2738ea08 -[__NSDictionaryM setObject:forKey:] + 696
 11  CoreFoundation                  0x27396da8 -[NSMutableDictionary addEntriesFromDictionary:] + 240
-12  AFWealth                        0x0014a238 0x29000 + 1184312
-13  AFWealth                        0x0014a312 0x29000 + 1184530
-14  AFWealth                        0x0014a584 0x29000 + 1185156
+12  SampleApp                        0x0014a238 0x29000 + 1184312
+13  SampleApp                        0x0014a312 0x29000 + 1184530
+14  SampleApp                        0x0014a584 0x29000 + 1185156
 15  Foundation                      0x281401f2 _decodeObjectBinary + 3042
 16  Foundation                      0x2813f500 _decodeObject + 272
 17  Foundation                      0x2813e8f2 +[NSKeyedUnarchiver unarchiveObjectWithData:] + 78
-18  AFWealth                        0x0003089e 0x29000 + 30878
-19  AFWealth                        0x0033f240 0x29000 + 3236416
-20  AFWealth                        0x0033f1d4 0x29000 + 3236308
-21  AFWealth                        0x0033cf6e 0x29000 + 3227502
-22  AFWealth                        0x0035f92c 0x29000 + 3369260
-23  AFWealth                        0x0035f8d4 0x29000 + 3369172
-24  AFWealth                        0x0020573a 0x29000 + 1951546
-25  AFWealth                        0x00204ea8 0x29000 + 1949352
+18  SampleApp                        0x0003089e 0x29000 + 30878
+19  SampleApp                        0x0033f240 0x29000 + 3236416
+20  SampleApp                        0x0033f1d4 0x29000 + 3236308
+21  SampleApp                        0x0033cf6e 0x29000 + 3227502
+22  SampleApp                        0x0035f92c 0x29000 + 3369260
+23  SampleApp                        0x0035f8d4 0x29000 + 3369172
+24  SampleApp                        0x0020573a 0x29000 + 1951546
+25  SampleApp                        0x00204ea8 0x29000 + 1949352
 26  libdispatch.dylib               0x363472e0 _dispatch_call_block_and_release + 8
 27  libdispatch.dylib               0x3635137c _dispatch_root_queue_drain + 1384
 28  libdispatch.dylib               0x363523be _dispatch_worker_thread3 + 90
@@ -91,8 +91,8 @@ Thread 18 crashed with ARM Thread State (32-bit):
 
 // 加载的二进制文件
 Binary Images:
-// AFWealth二进制文件加载的代码段位置是0x29000到0x94fff,其architecture是armv7，其UUID是**路径中的FDEEBADC-71CB-4A64-A80E-AB30486877C9**，注意！这里给我们解析crash log带来了很大的作用。
-0x29000 - 0xd94fff AFWealth armv7  <166c5b9ea8cb381b930542bbaf3b979a> /var/mobile/Containers/Bundle/Application/FDEEBADC-71CB-4A64-A80E-AB30486877C9/AFWealth.app/AFWealth
+// SampleApp二进制文件加载的代码段位置是0x29000到0x94fff,其architecture是armv7，其UUID是**路径中的FDEEBADC-71CB-4A64-A80E-AB30486877C9**，注意！这里给我们解析crash log带来了很大的作用。
+0x29000 - 0xd94fff SampleApp armv7  <166c5b9ea8cb381b930542bbaf3b979a> /var/mobile/Containers/Bundle/Application/FDEEBADC-71CB-4A64-A80E-AB30486877C9/SampleApp.app/SampleApp
 
 // 以下是app运行所需要的所有的二进制文件
 0x1fef8000 - 0x1ff1bfff dyld armv7s  <89c8b5de05ef310e9c399d3abd699990> /usr/lib/dyld
@@ -114,7 +114,7 @@ Binary Images:
 
 
 # 0x29000之谜
-相信仔细看完上面的这个crashlog例子，大家对crashlog就不会感到那么陌生了。我们正要信心满满准备搞定crash的时候，仔细一看，才发现Thread 18给的crash信息在最关键的位置给打了码。这是为什么呢？为什么系统不将这些关键信息公之于众呢？要想搞明白这个问题，就需要弄明白AFWealth这个二进制文件是怎么生成的了。
+相信仔细看完上面的这个crashlog例子，大家对crashlog就不会感到那么陌生了。我们正要信心满满准备搞定crash的时候，仔细一看，才发现Thread 18给的crash信息在最关键的位置给打了码。这是为什么呢？为什么系统不将这些关键信息公之于众呢？要想搞明白这个问题，就需要弄明白SampleApp这个二进制文件是怎么生成的了。
 
 要想解开0x29000之谜，咱们先从简单的hello程序出发，寻找其中的奥秘。
 学过C++的同学都知道，从编写源代码到生成可执行文件，中间需要经过以下几步，并辅以简单的hello world来说明。
@@ -223,8 +223,8 @@ target create --no-dependents --arch x86_64 a.out   #创建目标a.out
 image list                                          #查看加载的二进制文件
 
  # sample output
- #[  0] D081A049-722D-39D9-A9E8-4B1D79BA0AEB 0x0000000100000000 /Users/fragno/Program/cpptest/a.out 
- #      /Users/fragno/Program/cpptest/a.out.dSYM/Contents/Resources/DWARF/a.out
+ #[  0] D081A049-722D-39D9-A9E8-4B1D79BA0AEB 0x0000000100000000 /Users/xxuser/Program/cpptest/a.out 
+ #      /Users/xxuser/Program/cpptest/a.out.dSYM/Contents/Resources/DWARF/a.out
 
 image load --file a.out __TEXT 0                    #加载image到内存中，并且把TEXT段的其实地址设为0
 
@@ -236,7 +236,7 @@ image lookup -a 0xfa0                               #比如我们要查看000000
 
 是不是很神奇，我们发现，这样我们找出来的符号是main，而a.out的符号表中main对应的地址也正好是0x0000000100000fa0！
 
-好了，以上就是解密crash的全部原理了，那么说了那么多，相信大家都知道**0x29000就是我们hello中的0x0000000100000000**了，也就是**AFWealth代码段的起始地址**，相信大家也知道如果有了符号表，那么所有的真相都将被公之于众。
+好了，以上就是解密crash的全部原理了，那么说了那么多，相信大家都知道**0x29000就是我们hello中的0x0000000100000000**了，也就是**SampleApp代码段的起始地址**，相信大家也知道如果有了符号表，那么所有的真相都将被公之于众。
 
 # <h2 id="crashPractice">crashlog解密实战</h2>
 上文提及，发布的二进制包有两种情况，一种是包含符号表的，一种是不包含的，下面我们的解析也就分两种，首先是有符号表的，其次是没有符号表的。
@@ -259,35 +259,35 @@ Thread 18 Crashed:
 9   CoreFoundation                  0x2746f952 __rehashd + 22
 10  CoreFoundation                  0x2738ea08 -[__NSDictionaryM setObject:forKey:] + 696
 11  CoreFoundation                  0x27396da8 -[NSMutableDictionary addEntriesFromDictionary:] + 240
-12  AFWealth                        0x0014a238 0x29000 + 1184312
-13  AFWealth                        0x0014a312 0x29000 + 1184530
+12  SampleApp                        0x0014a238 0x29000 + 1184312
+13  SampleApp                        0x0014a312 0x29000 + 1184530
 ```
 
 ```asm
-target create --no-dependents --arch armv7 AFWealth.app/AFWealth  // 这里arch需要根据crash log中的二进制文件部分查看
+target create --no-dependents --arch armv7 SampleApp.app/SampleApp  // 这里arch需要根据crash log中的二进制文件部分查看
  
  # sample output
- # Current executable set to 'AFWealth.app/AFWealth' (armv7).
+ # Current executable set to 'SampleApp.app/SampleApp' (armv7).
 
 image list
 
  # sample output
- # [  0] 166C5B9E-A8CB-381B-9305-42BBAF3B979A 0x00004000 /Users/fragno/Desktop/crash/AFWealth.app/AFWealth 
- #     /Users/fragno/Desktop/crash/AFWealth.app.dSYM/Contents/Resources/DWARF/AFWealth
+ # [  0] 166C5B9E-A8CB-381B-9305-42BBAF3B979A 0x00004000 /Users/xxuser/Desktop/crash/SampleApp.app/SampleApp 
+ #     /Users/xxuser/Desktop/crash/SampleApp.app.dSYM/Contents/Resources/DWARF/SampleApp
 
-image load --file AFWealth __TEXT 0
+image load --file SampleApp __TEXT 0
  # sample output 
  # section '__TEXT' loaded at 0x0
 
 image lookup -a 1184312
  # sample output
- # Address: AFWealth[0x00125238]  (AFWealth.__TEXT.__text + 1154248)
- #     Summary: AFWealth`-[AFWBaseModel codableProperties] + 212 at AFWBaseModel.m:151
+ # Address: SampleApp[0x00125238]  (SampleApp.__TEXT.__text + 1154248)
+ #     Summary: SampleApp`-[AFWBaseModel codableProperties] + 212 at AFWBaseModel.m:151
 
 image lookup -a 1184530
  # sample output
- # Address: AFWealth[0x00125312]  (AFWealth.__TEXT.__text + 1154466)
- # Summary: AFWealth`-[AFWBaseModel setWithCoder:] + 150 at AFWBaseModel.m:163
+ # Address: SampleApp[0x00125312]  (SampleApp.__TEXT.__text + 1154466)
+ # Summary: SampleApp`-[AFWBaseModel setWithCoder:] + 150 at AFWBaseModel.m:163
 
 ```
 
@@ -295,39 +295,39 @@ image lookup -a 1184530
 ## 二进制中没有符号表
 没有符号表的话，解析之前需要准备三样东西：
 
-+ crash log（i.e. AFWealth.crash）,可以通过Xcode或者itunes导出[crash log的导出](https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppDistributionGuide/AnalyzingCrashReports/AnalyzingCrashReports.html)
-+ .app package（i.e. AFWealth.app），可以通过解压ipa包，从Payload中获得，也可以直接从机器上拷贝
-    /User/Containers/Bundle/Application/9D8A82D6-DFE5-45FD-B994-77C93A294B03/AFWealth.app 真机上的app位置
-+ .dSYM package，其包含调试信息（i.e. AFWealth.app.dSYM）
-    /Users/fragno/Library/Developer/Xcode/DerivedData/AFWealth-eangdqkywlcbatcvllxataoasqrj/Build/Products 可在这个目录下找到
++ crash log（i.e. SampleApp.crash）,可以通过Xcode或者itunes导出[crash log的导出](https://developer.apple.com/library/ios/documentation/IDEs/Conceptual/AppDistributionGuide/AnalyzingCrashReports/AnalyzingCrashReports.html)
++ .app package（i.e. SampleApp.app），可以通过解压ipa包，从Payload中获得，也可以直接从机器上拷贝
+    /User/Containers/Bundle/Application/9D8A82D6-DFE5-45FD-B994-77C93A294B03/SampleApp.app 真机上的app位置
++ .dSYM package，其包含调试信息（i.e. SampleApp.app.dSYM）
+    /Users/xxuser/Library/Developer/Xcode/DerivedData/SampleApp-eangdqkywlcbatcvllxataoasqrj/Build/Products 可在这个目录下找到
 
 接着需要验证这三样东西是否匹配：([How to Match a Crash Report to a Build](https://developer.apple.com/library/ios/qa/qa1765/_index.html))
 
 + 查看crash log的UUID： Binary Images下的UUID
 + 使用dwarfdump查看binary package的UUID
 ```shell
-dwarfdump --uuid AFWealth.app/AFWealth
+dwarfdump --uuid SampleApp.app/SampleApp
 ```
 
 + 查看.dSYM的UUID
 ```shell
-dwarfdump --uuid AFWealth.app.dSYM
+dwarfdump --uuid SampleApp.app.dSYM
 ```
 三者的uuid一致的话，就说明准备完毕了，然后将他们放在一个目录下，目录结构如下
 ```shell
 ls ./
 
  #sample output
- # AFWealth.app
- # AFWealth.app.dSYM
- # AFWealth.crash
+ # SampleApp.app
+ # SampleApp.app.dSYM
+ # SampleApp.crash
 ```
 
 全部准备工作完毕以后，就可以直接使用xcode提供的工具来符号化了。
 1、**推荐用法symbolicatecrash**
 ```shell
  # 一般symbolicatecrash 都在此目录下，如果不在的话，可以尝试在/Applications目录下搜索 find ./ -name symbolicatecrash 
-/Applications/Xcode.app/Contents/SharedFrameworks/DTDeviceKitBase.framework/Versions/A/Resources/symbolicatecrash -v AFWealth.crash 2> symbolicatecrash.log
+/Applications/Xcode.app/Contents/SharedFrameworks/DTDeviceKitBase.framework/Versions/A/Resources/symbolicatecrash -v SampleApp.crash 2> symbolicatecrash.log
 
  # 如果报 “DEVELOPER_DIR” is not defined错误，那就执行
  # export DEVELOPER_DIR="/Applications/XCode.app/Contents/Developer"
@@ -335,16 +335,16 @@ ls ./
 
 2、**atos** ([atos man page](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/atos.1.html))
 ```shell
-xcrun atos -o AFWealth.app.dSYM/Contents/Resources/DWARF/AFWealth -l 0x29000 -arch armv7        # 这些参数都可以在crashlog文件的二进制文件部分获得
+xcrun atos -o SampleApp.app.dSYM/Contents/Resources/DWARF/SampleApp -l 0x29000 -arch armv7        # 这些参数都可以在crashlog文件的二进制文件部分获得
 
  # 然后输入crash地址就可以了
 
 0x0014a238
  # sample output
- # -[AFWBaseModel codableProperties]  (in AFWealth) (AFWBaseModel.m:151)
+ # -[AFWBaseModel codableProperties]  (in SampleApp) (AFWBaseModel.m:151)
 0x0014a312
  # sample output
- # -[AFWBaseModel setWithCoder:]  (in AFWealth) (AFWBaseModel.m:163)
+ # -[AFWBaseModel setWithCoder:]  (in SampleApp) (AFWBaseModel.m:163)
 ```
 
 如果使用了上面的方法还是不能解，那就只能再检查一遍uuid有没有对上、arch有没有写对。
