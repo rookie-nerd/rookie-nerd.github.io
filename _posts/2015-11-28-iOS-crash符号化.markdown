@@ -326,6 +326,7 @@ ls ./
 全部准备工作完毕以后，就可以直接使用xcode提供的工具来符号化了。
 1、**推荐用法symbolicatecrash**
 ```shell
+ # 一般symbolicatecrash 都在此目录下，如果不在的话，可以尝试在/Applications目录下搜索 find ./ -name symbolicatecrash 
 /Applications/Xcode.app/Contents/SharedFrameworks/DTDeviceKitBase.framework/Versions/A/Resources/symbolicatecrash -v AFWealth.crash 2> symbolicatecrash.log
 
  # 如果报 “DEVELOPER_DIR” is not defined错误，那就执行
@@ -334,9 +335,9 @@ ls ./
 
 2、**atos** ([atos man page](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/atos.1.html))
 ```shell
-xcrun atos -o AFWealth.app.dSYM/Contents/Resources/DWARF/AFWealth -l 0x29000 -arch armv7        // 这些参数都可以在crashlog文件的二进制文件部分获得
+xcrun atos -o AFWealth.app.dSYM/Contents/Resources/DWARF/AFWealth -l 0x29000 -arch armv7        # 这些参数都可以在crashlog文件的二进制文件部分获得
 
-// 然后输入crash地址就可以了
+ # 然后输入crash地址就可以了
 
 0x0014a238
  # sample output
