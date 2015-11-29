@@ -215,7 +215,8 @@ strip a.stripped.out
 ```
 仔细观察两者的差别，可以发现strip之后，a.stripped.out文件比a.out笑了，其中很多符号被移除了，比如\_main,GCC_except_table2等。一般正式发布的二进制都会将将符号表strip，以便减少安装包的大小。
 
-3、使用lldb加载二进制 [lldb](http://lldb.llvm.org/symbolication.html)
+3、使用lldb加载二进制([lldb](http://lldb.llvm.org/symbolication.html))
+
 lldb是下一代的高性能调试器，使用lldb可以帮助我们调试和验证。
 
 ```shell
