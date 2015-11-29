@@ -301,12 +301,12 @@ image lookup -a 1184530
 + .dSYM package，其包含调试信息（i.e. AFWealth.app.dSYM）
     /Users/fragno/Library/Developer/Xcode/DerivedData/AFWealth-eangdqkywlcbatcvllxataoasqrj/Build/Products 可在这个目录下找到
 
-接着需要验证这三样东西是否匹配：
+接着需要验证这三样东西是否匹配：([How to Match a Crash Report to a Build](https://developer.apple.com/library/ios/qa/qa1765/_index.html))
 
 + 查看crash log的UUID： Binary Images下的UUID
-+ 使用dwarfdump查看binary package的UUID,[How to Match a Crash Report to a Build](https://developer.apple.com/library/ios/qa/qa1765/_index.html)
++ 使用dwarfdump查看binary package的UUID
 ```shell
-dwarfdump --uuid AFWealth.app/example
+dwarfdump --uuid AFWealth.app/AFWealth
 ```
 
 + 查看.dSYM的UUID
@@ -332,13 +332,12 @@ ls ./
  # export DEVELOPER_DIR="/Applications/XCode.app/Contents/Developer"
 ```
 
-2、**atos** [atos man page](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/atos.1.html)
+2、**atos** ([atos man page](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/atos.1.html))
 ```shell
 xcrun atos -o AFWealth.app.dSYM/Contents/Resources/DWARF/AFWealth -l 0x29000 -arch armv7        // 这些参数都可以在crashlog文件的二进制文件部分获得
 
 // 然后输入crash地址就可以了
 
-```
 0x0014a238
  # sample output
  # -[AFWBaseModel codableProperties]  (in AFWealth) (AFWBaseModel.m:151)
