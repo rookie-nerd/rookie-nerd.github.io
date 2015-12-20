@@ -1,0 +1,427 @@
+---
+layout: post
+title: objc源码解析
+date: 2015.12.20
+categories: objective-c
+---
+
+# NSObject
+
+# AutoreleasePoolPage
+[黑幕背后的AutoreleasePool](http://blog.sunnyxx.com/2014/10/15/behind-autorelease/)
+
+```C++
+class AutoreleasePoolPage 
+{
+
+#define POOL_SENTINEL nil
+    static pthread_key_t const key = AUTORELEASE_POOL_KEY;
+    static uint8_t const SCRIBBLE = 0xA3;  // 0xA3A3A3A3 after releasing
+    static size_t const SIZE = 
+#if PROTECT_AUTORELEASEPOOL
+        PAGE_MAX_SIZE;  // must be multiple of vm page size
+#else
+        PAGE_MAX_SIZE;  // size and alignment, power of 2
+#endif
+    static size_t const COUNT = SIZE / sizeof(id);
+
+    magic_t const magic;
+    id *next;
+    pthread_t const thread;
+    AutoreleasePoolPage * const parent;
+    AutoreleasePoolPage *child;
+    uint32_t const depth;
+    uint32_t hiwat;
+    ......
+}
+```
+从上面的类成员变量可以看出
+
++ autoreleasePoolPage的默认大小是PAGE_MAX_SIZE
++ 每个线程都有自己的AutoreleasePoolPage
++ AutoReleasePoolPage是通过双向链表连接起来的。
+
+下面我们来看看autoreleasepoolpage的重要api
+
+```C++
+// 自动释放某个对象，即将该变量放入autoreleasePool
+static inline id autorelease(id obj)
+{
+    assert(obj);
+    assert(!obj->isTaggedPointer());
+    id *dest __unused = autoreleaseFast(obj);
+    assert(!dest  ||  *dest == obj);
+    return obj;
+}
+
+// 调用push的时候，都是创建一个新的Page，然后在Page中加入SENTINEL
+// 一般在线程runloop开始的时候会调用push函数
+static inline void *push() 
+{
+    id *dest;
+    if (DebugPoolAllocation) {
+        // Each autorelease pool starts on a new pool page.
+        dest = autoreleaseNewPage(POOL_SENTINEL);
+    } else {
+        dest = autoreleaseFast(POOL_SENTINEL);
+    }
+    assert(*dest == POOL_SENTINEL);
+    return dest;
+}
+
+// 调用pop的时候，token一般是POOL_SENTINEL
+// 然后page会调用releaseUntil(stop)来释放push进来的全部对象，以POOL_SENTINEL为界限
+// 线程一般在runloop的开始的时候会调用push，而runloop结束的时候调用pop
+static inline void pop(void *token) 
+{
+    AutoreleasePoolPage *page;
+    id *stop;
+
+    page = pageForPointer(token);
+    stop = (id *)token;
+    if (DebugPoolAllocation  &&  *stop != POOL_SENTINEL) {
+        // This check is not valid with DebugPoolAllocation off
+        // after an autorelease with a pool page but no pool in place.
+        _objc_fatal("invalid or prematurely-freed autorelease pool %p; ", 
+        token);
+    }
+
+    if (PrintPoolHiwat) printHiwat();
+
+    page->releaseUntil(stop);
+
+    // memory: delete empty children
+    if (DebugPoolAllocation  &&  page->empty()) {
+        // special case: delete everything during page-per-pool debugging
+        AutoreleasePoolPage *parent = page->parent;
+        page->kill();
+        setHotPage(parent);
+        } else if (DebugMissingPools  &&  page->empty()  &&  !page->parent) {
+            // special case: delete everything for pop(top) 
+            // when debugging missing autorelease pools
+            page->kill();
+            setHotPage(nil);
+        } 
+        else if (page->child) {
+            // hysteresis: keep one empty child if page is more than half full
+            if (page->lessThanHalfFull()) {
+                page->child->kill();
+            }
+            else if (page->child->child) {
+                page->child->child->kill();
+            }
+        }
+}
+```
+在autoreleasePoolPage中有hotPage和coldPage的概念。刚创建的autoreleasePoolPage是hot的，其存放在线程的tls中，方便存取，而coldPage是最先创建的autoreleasePoolPage。例如上面的push函数，其创建的page都会被立马设置成hotpage。
+
+```C++
+void *
+objc_autoreleasePoolPush(void)
+{
+    if (UseGC) return nil;
+    return AutoreleasePoolPage::push();
+}
+
+void
+objc_autoreleasePoolPop(void *ctxt)
+{
+    if (UseGC) return;
+    AutoreleasePoolPage::pop(ctxt);
+}
+
+
+void *
+_objc_autoreleasePoolPush(void)
+{
+    return objc_autoreleasePoolPush();
+}
+
+void
+_objc_autoreleasePoolPop(void *ctxt)
+{
+    objc_autoreleasePoolPop(ctxt);
+}
+```
+以上4个函数就是runloop在真正调用的函数。
+
+
+# SideTable
+sideTable在Objective-c中负责存储引用计数和弱引用关系，这些功能可以从其结构中一窥端倪。
+
+```C++
+struct SideTable {
+    spinlock_t slock;
+    RefcountMap refcnts;
+    weak_table_t weak_table;
+
+    SideTable() {
+        memset(&weak_table, 0, sizeof(weak_table));
+    }
+
+    ~SideTable() {
+        _objc_fatal("Do not delete SideTable.");
+    }
+
+    void lock() { slock.lock(); }
+    void unlock() { slock.unlock(); }
+    bool trylock() { return slock.trylock(); }
+
+    // Address-ordered lock discipline for a pair of side tables.
+
+    template<bool HaveOld, bool HaveNew>
+    static void lockTwo(SideTable *lock1, SideTable *lock2);
+    template<bool HaveOld, bool HaveNew>
+    static void unlockTwo(SideTable *lock1, SideTable *lock2);
+};
+```
+
+从上述代码可以看出，sideTable结构体主要包含三个变量
+
++ slock：锁变量
++ refcnts：引用计数
++ weak_table：弱引用表
+
+
+## refcnts
+OC的引用计数功能是由NonPointerISA和sideTable功能来实现的，我们已经知道，当retainCount比较小的时候，是通过isa来存储的，当retainCount变得很大，isa存不下的时候，就会用到sidetable来存放。这一点我们可以通过几个函数来看。
+
+```C++
+// Move the entire retain count to the side table, 
+// as well as isDeallocating and weaklyReferenced.
+void 
+objc_object::sidetable_moveExtraRC_nolock(size_t extra_rc, 
+                                          bool isDeallocating, 
+                                          bool weaklyReferenced);
+
+// Move some retain counts to the side table from the isa field.
+// Returns true if the object is now pinned.
+bool 
+objc_object::sidetable_addExtraRC_nolock(size_t delta_rc);
+
+// Move some retain counts from the side table to the isa field.
+// Returns the actual count subtracted, which may be less than the request.
+size_t 
+objc_object::sidetable_subExtraRC_nolock(size_t delta_rc);
+```
+
+下面我们就看看sidetable是如何在retain的时候增加引用计数，在release的时候减少引用计数的
+
+```C++
+// sidetable retain
+id
+objc_object::sidetable_retain()
+{
+#if SUPPORT_NONPOINTER_ISA
+    assert(!isa.indexed);
+#endif
+    SideTable& table = SideTables()[this];
+
+    if (table.trylock()) {
+        size_t& refcntStorage = table.refcnts[this];
+        if (! (refcntStorage & SIDE_TABLE_RC_PINNED)) {
+            refcntStorage += SIDE_TABLE_RC_ONE;             // 引用计数加1
+        }
+        table.unlock();
+        return (id)this;
+    }
+    return sidetable_retain_slow(table);
+}
+
+// sidetable release
+uintptr_t 
+objc_object::sidetable_release(bool performDealloc)
+{
+#if SUPPORT_NONPOINTER_ISA
+    assert(!isa.indexed);
+#endif
+    SideTable& table = SideTables()[this];
+
+    bool do_dealloc = false;
+
+    if (table.trylock()) {
+        RefcountMap::iterator it = table.refcnts.find(this);
+        if (it == table.refcnts.end()) {
+            do_dealloc = true;
+            table.refcnts[this] = SIDE_TABLE_DEALLOCATING;
+        } else if (it->second < SIDE_TABLE_DEALLOCATING) {
+            // SIDE_TABLE_WEAKLY_REFERENCED may be set. Don't change it.
+            do_dealloc = true;
+            it->second |= SIDE_TABLE_DEALLOCATING;
+        } else if (! (it->second & SIDE_TABLE_RC_PINNED)) {
+            it->second -= SIDE_TABLE_RC_ONE;                    // 引用计数减1
+        }
+        table.unlock();
+        if (do_dealloc  &&  performDealloc) {
+            ((void(*)(objc_object *, SEL))objc_msgSend)(this, SEL_dealloc);
+        }
+        return do_dealloc;
+    }
+
+    return sidetable_release_slow(table, performDealloc);
+}
+```
+
+
+
+
+## weak_table
+
+```C++
+// We cannot use a C++ static initializer to initialize SideTables because
+// libc calls us before our C++ initializers run. We also don't want a global 
+// pointer to this struct because of the extra indirection.
+// Do it the hard way.
+alignas(StripedMap<SideTable>) static uint8_t 
+    SideTableBuf[sizeof(StripedMap<SideTable>)];
+
+static void SideTableInit() {
+    new (SideTableBuf) StripedMap<SideTable>();
+}
+
+static StripedMap<SideTable>& SideTables() {
+    return *reinterpret_cast<StripedMap<SideTable>*>(SideTableBuf);
+}
+```
+
+从上述代码可以看出，SideTable的初始化是静态的，其是**全局静态变量**，这一点值得关注。下面我们结合代码看看，SideTable是如何存储和销毁weak变量的。
+
+```C++
+template <bool HaveOld, bool HaveNew, bool CrashIfDeallocating>
+static id 
+storeWeak(id *location, objc_object *newObj)
+{
+    ......
+    // 如果在location对应的位置下有老的weak变量，在weak_table中反注册老变量
+    // Clean up old value, if any.
+    if (HaveOld) {
+        weak_unregister_no_lock(&oldTable->weak_table, oldObj, location);
+    }
+
+    // 如果是新的weak变量，那么在weak_table中注册该变量
+    // Assign new value, if any.
+    if (HaveNew) {
+        newObj = (objc_object *)weak_register_no_lock(&newTable->weak_table, 
+                                                      (id)newObj, location, 
+                                                      CrashIfDeallocating);
+        // weak_register_no_lock returns nil if weak store should be rejected
+        ......
+    }
+    ......
+}
+
+// 先简单看下weak_table结构体
+/**
+ * The global weak references table. Stores object ids as keys,
+ * and weak_entry_t structs as their values.
+ */
+struct weak_table_t {
+    weak_entry_t *weak_entries;
+    size_t    num_entries;
+    uintptr_t mask;
+    uintptr_t max_hash_displacement;
+};
+
+// 在weak_table中反注册weak变量
+weak_unregister_no_lock(weak_table_t *weak_table, id referent_id, 
+                        id *referrer_id)
+{
+    objc_object *referent = (objc_object *)referent_id;
+    objc_object **referrer = (objc_object **)referrer_id;
+
+    weak_entry_t *entry;
+
+    if (!referent) return;
+
+    if ((entry = weak_entry_for_referent(weak_table, referent))) {
+        remove_referrer(entry, referrer); // 从weak_table中移除相关entry实现反注册
+        ......
+    }
+    ......
+}
+
+// 在weak_table中注册weak变量
+id 
+weak_register_no_lock(weak_table_t *weak_table, id referent_id, 
+                      id *referrer_id, bool crashIfDeallocating)
+{
+    objc_object *referent = (objc_object *)referent_id;
+    objc_object **referrer = (objc_object **)referrer_id;
+
+    if (!referent  ||  referent->isTaggedPointer()) return referent_id;
+
+    ......
+
+    // now remember it and where it is being stored
+    weak_entry_t *entry;
+    if ((entry = weak_entry_for_referent(weak_table, referent))) {
+        append_referrer(entry, referrer); // 如果相应的entry已经存在，那么继续添加
+    } 
+    else {
+        weak_entry_t new_entry;
+        new_entry.referent = referent;
+        new_entry.out_of_line = 0;
+        new_entry.inline_referrers[0] = referrer;
+        for (size_t i = 1; i < WEAK_INLINE_COUNT; i++) {
+            new_entry.inline_referrers[i] = nil;
+        }
+        
+        weak_grow_maybe(weak_table);
+
+        // 如果相应的entry不存在，那么创建新的entry，并插入weak_table实现注册
+        weak_entry_insert(weak_table, &new_entry); 
+    }
+
+    ......
+}
+```
+上面的代码片段，完整的展示了SideTable如何管理weak变量。
+
+
+
+
+# Objc重要的宏定义
+## SUPPORT_GC
+
+```C++
+#if TARGET_OS_EMBEDDED  ||  TARGET_OS_IPHONE  ||  TARGET_OS_WIN32  ||  (TARGET_OS_MAC && __x86_64h__)
+#   define SUPPORT_GC 0
+#else
+#   define SUPPORT_GC 1
+#endif
+```
+
+可以发现，现在都是不支持GC的
+
+
+## SUPPORT_TAGGED_POINTERS
+[唐巧-深入理解Tagged Pointer](http://www.infoq.com/cn/articles/deep-understanding-of-tagged-pointer)
+[wikipedia-Tagged Pointer](https://en.wikipedia.org/wiki/Tagged_pointer)
+
+```C++
+// Define SUPPORT_TAGGED_POINTERS=1 to enable tagged pointer objects
+// Be sure to edit tagged pointer SPI in objc-internal.h as well.
+#if !(__OBJC2__  &&  __LP64__)
+#   define SUPPORT_TAGGED_POINTERS 0
+#else
+#   define SUPPORT_TAGGED_POINTERS 1
+#endif
+```
+
+可以发现，只有64位机器才是支持Tagged Pointer的。
+
+
+## SUPPORT_NONPOINTER_ISA
+[Non-pointer isa](http://www.sealiesoftware.com/blog/archive/2013/09/24/objc_explain_Non-pointer_isa.html)
+
+```C++
+// Define SUPPORT_NONPOINTER_ISA=1 to enable extra data in the isa field.
+#if !__LP64__  ||  TARGET_OS_WIN32  ||  TARGET_IPHONE_SIMULATOR
+#   define SUPPORT_NONPOINTER_ISA 0
+#else
+#   define SUPPORT_NONPOINTER_ISA 1
+#endif
+```
+可以发现只有64位真机才支持NonPointerISA，模拟器是不支持的。
+
+
