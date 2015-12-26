@@ -422,11 +422,10 @@ weak_register_no_lock(weak_table_t *weak_table, id referent_id,
 ```
 可以发现只有64位真机才支持NonPointerISA，模拟器是不支持的。
 
-# NSObject
+# NSObject ([刨根问底Objective-c Runtime](http://chun.tips/blog/2014/11/05/bao-gen-wen-di-objective[nil]c-runtime-(2)[nil]-object-and-class-and-meta-class/))
 
 ## self
 细心的开发者可能发现，在类方法和实例方法中，都能使用self，那这两个self有什么不一样呢？
-([刨根问底Objective-c Runtime](http://chun.tips/blog/2014/11/05/bao-gen-wen-di-objective[nil]c-runtime-(2)[nil]-object-and-class-and-meta-class/))
 
 ```Objective-c
 + (id)self {
@@ -442,5 +441,196 @@ weak_register_no_lock(weak_table_t *weak_table, id referent_id,
 ![instance、class、metaclass关系](/img/runtime1.png)
 
 从上图可以看到，instance是Class的实例，而Class是Meta Class的实例，这样上面两个self就比较清晰了。类方法的self，其实指向的是Meta Class的实例，也就是NSObject；而实例方法的self，其实指向的是Class的实例，也就是NSObject的实例。
+
+## Class && id
+既然说到class，那就聊聊class到底是什么鬼，顺便聊聊常用的id是什么鬼。
+
+```Objective-c
+typedef struct objc_class *Class;
+typedef struct objc_object *id;
+
+struct objc_class {
+    Class isa  OBJC_ISA_AVAILABILITY;
+
+#if !__OBJC2__
+    Class super_class                                        OBJC2_UNAVAILABLE;
+    const char *name                                         OBJC2_UNAVAILABLE;
+    long version                                             OBJC2_UNAVAILABLE;
+    long info                                                OBJC2_UNAVAILABLE;
+    long instance_size                                       OBJC2_UNAVAILABLE;
+    struct objc_ivar_list *ivars                             OBJC2_UNAVAILABLE;
+    struct objc_method_list **methodLists                    OBJC2_UNAVAILABLE;
+    struct objc_cache *cache                                 OBJC2_UNAVAILABLE;
+    struct objc_protocol_list *protocols                     OBJC2_UNAVAILABLE;
+#endif
+
+} OBJC2_UNAVAILABLE;
+
+struct objc_object {
+    Class isa  OBJC_ISA_AVAILABILITY;
+};
+```
+仔细查看上面的代码可以发现，id其实就是`objc_object *`, 也就是Class的实例，通过isa指针可以找到实例对应的类。
+
+比较复杂的是Class，其原型是`objc_class`，可以发现其也有一个isa指针，说明类其实也是其他类的实例，而这个其他类，就是我们上文提到的meta class。`objc_class`结构体中还存储了类对象的实例变量列表、方法列表以及协议列表等，这些都可以在运行时改变。
+
+那如何判断一个Class是否是meta Class呢？下面我们就看下`objc-runtime-new.h`下的新的objc_class的定义。
+
+```Objective-c
+// 这是新的objc_class对象的定义
+struct objc_class : objc_object {
+    // Class ISA;
+    Class superclass;
+    cache_t cache;             // formerly cache pointer and vtable
+    class_data_bits_t bits;    // class_rw_t * plus custom rr/alloc flags
+
+    ......
+
+    bool isMetaClass() {
+        assert(this);
+        assert(isRealized());
+        return data()->ro->flags & RO_META;
+    }
+
+    // NOT identical to this->ISA when this is a metaclass
+    Class getMeta() {
+        if (isMetaClass()) return (Class)this;
+        else return this->ISA();
+    }
+
+    bool isRootClass() {
+        return superclass == nil;
+    }
+    bool isRootMetaclass() {
+        return ISA() == (Class)this;
+    }
+
+    ......
+};
+```
+是不是非常直观，objc_class结构体是继承自objc_object结构体的，而判断是够是MetaClass是由data中的一个bit位来决定的。
+
+既然我们了解了instance、Class和Meta Class的关系，也了解了`objc_class`和`objc_object`的结构，接下来我们就来看几个比较有意思的方法，也是我们平常比较常用的方法。
+
+`isMemberOfClass` VS `isKindOfClass`
+
+```Objective-c
+// 判断是够是当前类的实例
+- (BOOL)isMemberOfClass:(Class)cls {
+    return [self class] == cls;
+}
+
+// 判断是否是当前类或者其父类的实例
+- (BOOL)isKindOfClass:(Class)cls {
+    for (Class tcls = [self class]; tcls; tcls = tcls->superclass) {
+        if (tcls == cls) return YES;
+    }
+    return NO;
+}
+```
+
+`respondsToSelector`
+
+```Objective-C
+// 判断当前对象是否能够响应某个函数
+- (BOOL)respondsToSelector:(SEL)sel {
+    if (!sel) return NO;
+    return class_respondsToSelector_inst([self class], sel, self);
+}
+
+bool class_respondsToSelector_inst(Class cls, SEL sel, id inst)
+{
+    IMP imp;
+
+    // 如果没有指定方法或者类，返回NO
+    if (!sel  ||  !cls) return NO;
+
+    // Avoids +initialize because it historically did so.
+    // We're not returning a callable IMP anyway.
+    imp = lookUpImpOrNil(cls, sel, inst, 
+                         NO/*initialize*/, YES/*cache*/, YES/*resolver*/);
+    return bool(imp);
+}
+
+// 查找Sel对用的IMP实现，可以指定是否使用cache（这里cache是为了加快访问速度，后续就不再展现这部分逻辑）
+IMP lookUpImpOrNil(Class cls, SEL sel, id inst, 
+                   bool initialize, bool cache, bool resolver)
+{
+    IMP imp = lookUpImpOrForward(cls, sel, inst, initialize, cache, resolver);
+    if (imp == _objc_msgForward_impcache) return nil;
+    else return imp;
+}
+
+IMP lookUpImpOrForward(Class cls, SEL sel, id inst, 
+                       bool initialize, bool cache, bool resolver)
+{
+    ......
+
+    while ((curClass = curClass->superclass)) {
+        ......
+        // 从当前类以及其父类中寻找sel对应的实现
+        meth = _class_getMethodNoSuper_nolock(curClass, sel);
+        ......
+    }
+    ......
+}
+
+static Method _class_getMethodNoSuper_nolock(Class cls, SEL sel)
+{
+    methodListLock.assertLocked();
+    return (Method)_findMethodInClass(cls, sel);
+}
+
+static inline old_method * _findMethodInClass(Class cls, SEL sel) {
+    .......
+        // 可以发现，method的寻找是从之前我们提到的cls结构体中的methodList中取出的
+        mlistp = (old_method_list **)&cls->methodLists;
+        *mlistp = fixupSelectorsInMethodList(cls, *mlistp);
+        return _findMethodInList(*mlistp, sel);
+    ......
+}
+```
+
+`conformsToProtocol:`
+
+```Objective-C
+// 判断实例能否响应某个protocol
+- (BOOL)conformsToProtocol:(Protocol *)protocol {
+    if (!protocol) return NO;
+    for (Class tcls = [self class]; tcls; tcls = tcls->superclass) {
+        if (class_conformsToProtocol(tcls, protocol)) return YES;
+    }
+    return NO;
+}
+
+BOOL protocol_conformsToProtocol(Protocol *self_gen, Protocol *other_gen)
+{
+    if (self->protocol_list) {
+        int i;
+        for (i = 0; i < self->protocol_list->count; i++) {
+            old_protocol *proto = self->protocol_list->list[i];
+            // 比较class的protocol_list中有的protocol_name和传参name
+            if (0 == strcmp(other->protocol_name, proto->protocol_name)) {
+                return YES;
+            }
+            if (protocol_conformsToProtocol((Protocol *)proto, other_gen)) {
+                return YES;
+            }
+        }
+    }
+    return NO;
+}
+
+```
+
+`performSelector:`
+
+```Objective-C
++ (id)performSelector:(SEL)sel {
+    if (!sel) [self doesNotRecognizeSelector:sel];
+    // 其实质就是直接调用C的函数objc_msgSend
+    return ((id(*)(id, SEL))objc_msgSend)((id)self, sel);
+}
+```
 
 
