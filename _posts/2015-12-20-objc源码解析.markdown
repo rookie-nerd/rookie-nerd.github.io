@@ -633,4 +633,13 @@ BOOL protocol_conformsToProtocol(Protocol *self_gen, Protocol *other_gen)
 }
 ```
 
+## 动态方法解析
+
+![动态方法解析](/img/runtime2.jpg)
+
+
+# 参考资料
++ [objc源码](https://github.com/opensource-apple/objc4)
++ <<Effective Objective-C 2.0>>
+
 
