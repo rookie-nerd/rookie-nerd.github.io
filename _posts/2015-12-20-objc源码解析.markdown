@@ -5,8 +5,6 @@ date: 2015.12.20
 categories: objective-c
 ---
 
-# NSObject
-
 # AutoreleasePoolPage
 [黑幕背后的AutoreleasePool](http://blog.sunnyxx.com/2014/10/15/behind-autorelease/)
 
@@ -423,5 +421,26 @@ weak_register_no_lock(weak_table_t *weak_table, id referent_id,
 #endif
 ```
 可以发现只有64位真机才支持NonPointerISA，模拟器是不支持的。
+
+# NSObject
+
+## self
+细心的开发者可能发现，在类方法和实例方法中，都能使用self，那这两个self有什么不一样呢？
+[刨根问底Objective-c Runtime](http://chun.tips/blog/2014/11/05/bao-gen-wen-di-objective[nil]c-runtime-(2)[nil]-object-and-class-and-meta-class/)
+
+```Objective-c
++ (id)self {
+    // 类方法的self是指class instance
+    return (id)self;
+}
+
+- (id)self {
+    // 实例方法的self是指the instance of the class
+    return self;
+}
+```
+![instance、class、metaclass关系](/img/runtime1.png)
+
+从上图可以看到，instance是Class的实例，而Class是Meta Class的实例，这样上面两个self就比较清晰了。类方法的self，其实指向的是Meta Class的实例，也就是NSObject；而实例方法的self，其实指向的是Class的实例，也就是NSObject的实例。
 
 
