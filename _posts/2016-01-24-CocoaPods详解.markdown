@@ -50,9 +50,17 @@ xcrun --sdk iphoneos9.0 --find clang
 
 ## xcodebuild
 xcodebuild用于构建Xcode工程中的一个或者多个target，或者构建Xcode工程或者workspace中的scheme
-
+```shell
+xcodebuild -project MyProject.xcodeproj -target Target1 -target Target2 -configuration Debug
+```
 
 ## xcode-select
+xcode-select控制xcrun、xcodebuild、cc以及其他xcode和BSD开发工具的developer目录，他使得不同版本xcode工具之间的切换变得简单。
+```shell
+xcode-select --switch /Applications/Xcode.app/Contents/Developer
+```
 
 ## xcodeproj
+[xcodeproj](http://www.rubydoc.info/gems/xcodeproj)
+xcodeproj是ruby写的用来创建和修改xcode工程的工具。
 
