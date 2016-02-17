@@ -39,6 +39,7 @@ workspace让Projects之间的工作变得简单，比如代码自动提示、跳
 scheme定义了一组需要构建的targets，以及构建时需要的配置和一组需要执行的test
 
 # Xcode Command Line
+
 ## xcrun
 xcrun可以用来定位Xcode的开发者工具，也可以用来调用Xcode的开发者工具
 ```shell
@@ -63,4 +64,139 @@ xcode-select --switch /Applications/Xcode.app/Contents/Developer
 ## xcodeproj
 [xcodeproj](http://www.rubydoc.info/gems/xcodeproj)
 xcodeproj是ruby写的用来创建和修改xcode工程的工具。
+
+
+# CocoaPods
+前面讲了那么多准备知识，对于理解cocoapods的源码还是非常有用的。下面我们正式进入cocoapods的源码解析。[CocoaPods源码地址](https://github.com/CocoaPods/CocoaPods)
+
+CocoaPods的源码结构为:
+CocoaPods
+    - bin        : pod和sandbox-pod命令目录
+    - example    : pod用法示例
+    - lib        : 真正的pod源码库
+        - cocoapods
+            - command
+            - downloader
+            - external_sources
+            - generator
+            - installer
+            - resolver
+            - sandbox
+            - target
+            - user_interface
+        - cocoapods.rb 包含了主要module和类的文件
+    - spec       : rspec单元测试的目录
+
+以上的目录结构，主要是按照模块功能划分的，总体来看分的还是比较清晰的。
+
+下面简单来看看cocoapods.rb文件
+```ruby
+  # 用于存储target相关的信息，整合pods下target的信息
+  autoload :AggregateTarget,           'cocoapods/target/aggregate_target'
+
+  # 实现了pod下的各种命令，具体的命令可以通过pod --help来查看
+  autoload :Command,                   'cocoapods/command'
+
+  # 用于移除cocoapods
+  autoload :Deintegrator,              'cocoapods_deintegrate'
+
+  # 用于支持可执行文件执行的模块
+  autoload :Executable,                'cocoapods/executable'
+
+  # 用于初始化外部资源类
+  autoload :ExternalSources,           'cocoapods/external_sources'
+
+  # 负责根据podfile生成Pods库
+  autoload :Installer,                 'cocoapods/installer'
+
+  # 提供了cocoapods的hook机制，便于plugins的编写
+  autoload :HooksManager,              'cocoapods/hooks_manager'
+
+  # 保存target的信息，用来编译单个pod
+  autoload :PodTarget,                 'cocoapods/target/pod_target'
+
+  # pod工程
+  autoload :Project,                   'cocoapods/project'
+
+  # 根据Podfile生成target的specifications
+  autoload :Resolver,                  'cocoapods/resolver'
+
+  # 用于支持Cocoapods install的时候用的目录操作
+  autoload :Sandbox,                   'cocoapods/sandbox'
+
+  # 管理所有的源代码
+  autoload :SourcesManager,            'cocoapods/sources_manager'
+
+  # 描述pods target
+  autoload :Target,                    'cocoapods/target'
+
+  # 检查一个specification是否合法
+  autoload :Validator,                 'cocoapods/validator'
+```
+可见cocoapods文件其实已经将cocoapods包含的功能描述的清清楚楚了，下面我们就选几个比较重要的模块进行简单的分析。
+
+## Installer
+首先我们来看看，当我们执行pod install的时候，到底是干了什么.
+```ruby
+def install!
+  prepare  # 做一些准备工作
+  resolve_dependencies   # 解析依赖关系
+  download_dependencies    # 下载依赖库
+  determine_dependency_product_types   # 查看依赖是静态库还是动态库
+  verify_no_duplicate_framework_names    # 检查是否有重复framework
+  verify_no_static_framework_transitive_dependencies   # 检查是否静态库有传递依赖
+  verify_framework_usage # 检查framework的使用，主要跟swift相关
+  generate_pods_project # 生成pods项目文件
+  integrate_user_project if installation_options.integrate_targets?  # 集成用户项目文件
+  perform_post_install_actions # 执行install后处理
+end
+```
+
+我们使用cocoaPods的时候写的podfile就会在解析依赖关系的时候被使用到。其核心代码如下：
+```ruby
+def resolve_dependencies
+  analyzer = create_analyzer # 创建分析器
+
+  plugin_sources = run_source_provider_hooks
+  analyzer.sources.insert(0, *plugin_sources)
+
+  UI.section 'Updating local specs repositories' do
+    analyzer.update_repositories # 这里是依赖解析的核心功能，用于下载和更新相关的依赖库
+  end unless config.skip_repo_update?
+
+  UI.section 'Analyzing dependencies' do
+    analyze(analyzer)
+    validate_build_configurations
+    clean_sandbox
+  end
+end
+```
+
+接下来看看如何将下载下来的依赖库整合进目标工程。也就是generate_pods_project函数
+```ruby
+def generate_pods_project
+  UI.section 'Generating Pods project' do
+    prepare_pods_project        # 做一些准备工作,比如新建project、设置platform以及deployment_target等
+    install_file_references  # 整合源文件和资源到Pods项目中
+    install_libraries # 构建pod_targets和aggregate_targets
+    set_target_dependencies # 增加每个aggregate目标的目标依赖，并将这个目标link在一起
+    run_podfile_post_install_hooks # 执行hooks
+    write_pod_project # 生成pod project文件
+    share_development_pod_schemes
+    write_lockfiles # 更新Podfile和PodLockfile
+  end
+end
+
+# FileReferencesInstaller
+def install!
+  refresh_file_accessors     # 从文件系统中读取文件
+  add_source_files_references # 将源文件加到Pods项目中
+  add_frameworks_bundles # 将framework加到Pods项目中
+  add_vendored_libraries # 将库加到Pods项目中
+  add_resources # 将资源加到Pods项目中
+  link_headers # 创建头文件的链接
+end
+
+```
+
 
