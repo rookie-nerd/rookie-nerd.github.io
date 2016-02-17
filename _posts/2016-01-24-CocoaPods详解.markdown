@@ -187,7 +187,7 @@ def generate_pods_project
   end
 end
 
-# FileReferencesInstaller
+ # FileReferencesInstaller
 def install!
   refresh_file_accessors     # 从文件系统中读取文件
   add_source_files_references # 将源文件加到Pods项目中
@@ -198,5 +198,151 @@ def install!
 end
 
 ```
+
+## Command
+pod提供了一系列命令行，供用户使用。
+```shell
+Usage:
+
+    $ pod COMMAND
+
+      CocoaPods, the Cocoa library package manager.
+
+Commands:
+
+    + cache      Manipulate the CocoaPods cache
+    + init       Generate a Podfile for the current directory.
+    + install    Install project dependencies to Podfile.lock versions
+    + ipc        Inter-process communication
+    + lib        Develop pods
+    + list       List pods
+    + outdated   Show outdated project dependencies
+    + plugins    Show available CocoaPods plugins
+    + repo       Manage spec-repositories
+    + search     Search for pods.
+    + setup      Setup the CocoaPods environment
+    + spec       Manage pod specs
+    + trunk      Interact with the CocoaPods API (e.g. publishing new specs)
+    + try        Try a Pod!
+    + update     Update outdated project dependencies and create new Podfile.lock
+
+Options:
+
+    --silent     Show nothing
+    --version    Show the version of the tool
+    --verbose    Show more debugging information
+    --no-ansi    Show output without ANSI codes
+    --help       Show help banner of specified command
+```
+这些命令绝大部分都在cocoapods/command目录下。其实现基本是一样的，下面简单的拿pod install 来作为示例解析。执行pod install --help可以看到如下输出
+```shell
+Usage:
+
+    $ pod install
+
+      Downloads all dependencies defined in `Podfile` and creates an Xcode Pods
+      library project in `./Pods`.
+
+      The Xcode project file should be specified in your `Podfile` like this:
+
+          xcodeproj 'path/to/XcodeProject'
+
+      If no xcodeproj is specified, then a search for an Xcode project will be made.
+      If more than one Xcode project is found, the command will raise an error.
+
+      This will configure the project to reference the Pods static library, add a
+      build configuration file, and add a post build script to copy Pod resources.
+
+Options:
+
+    --project-directory=/project/dir/   The path to the root of the project directory
+    --no-clean                          Leave SCM dirs like `.git` and `.svn` intact
+                                        after downloading
+    --no-integrate                      Skip integration of the Pods libraries in the
+                                        Xcode project(s)
+    --no-repo-update                    Skip running `pod repo update` before install
+    --silent                            Show nothing
+    --verbose                           Show more debugging information
+    --no-ansi                           Show output without ANSI codes
+    --help                              Show help banner of specified command
+```
+cocoapods中所有的command都是继承自[CLAide::Command](https://github.com/CocoaPods/CLAide), CLAide是是ruby下的命令行工具，其提供了参数解析和命令执行功能。
+```ruby
+module Project
+  module Options
+    def options
+      [
+        ['--no-repo-update', 'Skip running `pod repo update` before install'],
+      ].concat(super)
+    end
+  end
+
+  def self.included(base)
+    base.extend Options
+  end
+
+  def initialize(argv)
+    config.skip_repo_update = !argv.flag?('repo-update', !config.skip_repo_update)
+    super
+  end
+
+  # Runs the installer.
+  #
+  # @param  [Hash, Boolean, nil] update
+  #         Pods that have been requested to be updated or true if all Pods
+  #         should be updated
+  #
+  # @return [void]
+  #
+  def run_install_with_update(update)
+    installer = Installer.new(config.sandbox, config.podfile, config.lockfile)
+    installer.update = update
+    installer.install!
+  end
+end
+
+
+class Install < Command
+  include Project
+
+  self.summary = 'Install project dependencies to Podfile.lock versions'
+
+  self.description = <<-DESC
+    Downloads all dependencies defined in `Podfile` and creates an Xcode
+    Pods library project in `./Pods`.
+
+    The Xcode project file should be specified in your `Podfile` like this:
+
+        xcodeproj 'path/to/XcodeProject'
+
+    If no xcodeproj is specified, then a search for an Xcode project will
+    be made. If more than one Xcode project is found, the command will
+    raise an error.
+
+    This will configure the project to reference the Pods static library,
+    add a build configuration file, and add a post build script to copy
+    Pod resources.
+  DESC
+
+  def run
+    verify_podfile_exists!
+    run_install_with_update(false)
+  end
+end
+
+def run_install_with_update(update)
+  installer = Installer.new(config.sandbox, config.podfile, config.lockfile)
+  installer.update = update
+  installer.install!
+end
+```
+
+可以发现self.summary定义提供pod --help的简要描述，而self.description则定义了pod install --help的详细定义，options则是由self.options决定的。这里就不再详述了。当执行pod install的时候，实际执行的函数是run，即更新依赖并安装。
+
+# 总结
+上述分析只是简单的分析了CocoaPods的代码结构，熟悉CocoaPods的工作原理，熟悉ruby的代码规范，为以后解析CocoaPods代码细节提供基础，仅此而已。
+
+
+
 
 
