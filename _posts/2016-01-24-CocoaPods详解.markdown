@@ -70,6 +70,7 @@ xcodeproj是ruby写的用来创建和修改xcode工程的工具。
 前面讲了那么多准备知识，对于理解cocoapods的源码还是非常有用的。下面我们正式进入cocoapods的源码解析。[CocoaPods源码地址](https://github.com/CocoaPods/CocoaPods)
 
 CocoaPods的源码结构为:
+```
 CocoaPods
     - bin        : pod和sandbox-pod命令目录
     - example    : pod用法示例
@@ -86,6 +87,7 @@ CocoaPods
             - user_interface
         - cocoapods.rb 包含了主要module和类的文件
     - spec       : rspec单元测试的目录
+```
 
 以上的目录结构，主要是按照模块功能划分的，总体来看分的还是比较清晰的。
 
