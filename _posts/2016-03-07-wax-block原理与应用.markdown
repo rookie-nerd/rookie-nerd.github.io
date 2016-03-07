@@ -1,0 +1,219 @@
+---
+layout: post
+title: wax block原理与应用
+date: 2016.03.07
+categories: lua objective-c
+---
+
+# wax简介
+[wax](https://github.com/alibaba/wax)
+
+wax是Lua和Objective-C之间的桥梁。wax的目标是可以让你直接使用Lua来编写原生的app，其使用Objective-C的运行时在Lua和Objective-C之间建立桥梁。其最牛逼的地方在于你用Objective-C中写的任何东西，都是自动可以在Lua中获取的。
+
+# wax工作原理
+其实wax的定位非常明确，就是作为Lua和Objective-C之间的桥梁，而这个桥梁的核心基础，就是Runtime，也就是运行时。wax其实就是Objective-C和Lua之间的翻译官，在APP刚启动的时候会加载Lua脚本，wax会解析并运行Lua脚本，通过Runtime改变app运行。
+
+下面我们来看看wax是怎么样使用运行时来创建一个OC类的
+```Objective-C
+// 创建新的Objective-C类
+static int __call(lua_State *L) {   
+    const char *className = luaL_checkstring(L, 2);
+    // 通过运行时查找class对象
+    Class klass = objc_getClass(className);
+    
+    // 对象如果不存在则创建一个
+    if (!klass) {
+        Class superClass;    
+        if (lua_isuserdata(L, 3)) {
+            wax_instance_userdata *instanceUserdata = (wax_instance_userdata *)luaL_checkudata(L, 3, WAX_INSTANCE_METATABLE_NAME);
+            superClass = instanceUserdata->instance;
+        }
+        else if (lua_isnoneornil(L, 3)) {
+            superClass = [NSObject class];
+        }
+        else {
+            const char *superClassName = luaL_checkstring(L, 3);
+            superClass = objc_getClass(superClassName);
+        }
+        
+        if (!superClass) {
+            luaL_error(L, "Failed to create '%s'. Unknown superclass \"%s\" received.", className, luaL_checkstring(L, 3));
+        }
+        
+        // 使用运行时创建新的Class和metaClass
+        klass = objc_allocateClassPair(superClass, className, 0);
+        NSUInteger size;
+        NSUInteger alignment;
+        NSGetSizeAndAlignment("*", &size, &alignment);
+
+        // 将lua userdata作为类的属性
+        class_addIvar(klass, WAX_CLASS_INSTANCE_USERDATA_IVAR_NAME, size, alignment, "*"); // Holds a reference to the lua userdata
+
+        // 向Runtime注册该类
+        objc_registerClassPair(klass);        
+
+        // Make Key-Value complient
+        class_addMethod(klass, @selector(setValue:forUndefinedKey:), (IMP)setValueForUndefinedKey, "v@:@@");
+        class_addMethod(klass, @selector(valueForUndefinedKey:), (IMP)valueForUndefinedKey, "@@:@");        
+
+        // 获取类的metaClass
+        id metaclass = object_getClass(klass);
+        
+        // So objects created in ObjC will get an associated lua object
+        // Store the original allocWithZone implementation in case something secret goes on in there. 
+        // Calls to `alloc` always are end up calling `allocWithZone:` so we don't bother handling alloc here.
+        Method m = class_getInstanceMethod(metaclass, @selector(allocWithZone:));
+        
+        // If we the method has already been swizzled (by the class's super, then
+        // just leave it up to the super!
+        if (method_getImplementation(m) != (IMP)allocWithZone) {
+            class_addMethod(metaclass, @selector(wax_originalAllocWithZone:), method_getImplementation(m), method_getTypeEncoding(m));
+            class_addMethod(metaclass, @selector(allocWithZone:), (IMP)allocWithZone, "@@:^{_NSZone=}");
+        }
+    }
+        
+    // 实例化对象
+    wax_instance_create(L, klass, YES);
+    
+    return 1;
+}
+
+// wax自定义allocWithZone函数
+static id allocWithZone(id self, SEL _cmd, NSZone *zone) {
+    lua_State *L = wax_currentLuaState(); 
+    BEGIN_STACK_MODIFY(L);
+
+    id instance = [self wax_originalAllocWithZone:zone];
+    object_setInstanceVariable(instance, WAX_CLASS_INSTANCE_USERDATA_IVAR_NAME, @"YEAP");
+    
+    END_STACK_MODIFY(L, 0);
+    
+    return instance;
+}
+```
+看完上面的代码，或许大家都大概明白了wax的工作原理了，在Lua脚本中的一句waxClass{"LuaViewController"},其实就相当于在Runtime中创建了一个LuaViewController类。
+
+
+# wax block应用
+iOS的开发者都应该知道Block是Obejctive-C对象，其就是混合着数据和行为的OC对象，也就是我们平时所说的闭包。而在Lua中，OC的block其实就是特殊的wax函数，可以通过toblock来实现转换。[wax block](https://github.com/alibaba/wax/wiki/Block)
+
+下面就是block的示例：
+ OC代码：
+ ```Objective-C
+     [self testReturnIdWithFirstIdBlock:^id(id aFirstId, char *aCharPointer, char aChar, short aShort, int aInt, long long aLongLong, float aFloat, double aDouble, bool aBool, NSString *aString, id aId) {
+        NSLog(@"aFirstId=%@", aFirstId);
+        return @"123";
+     }];
+```
+对应的Lua代码:
+```lua
+  self:testReturnIdWithFirstIdBlock(
+        toobjc(
+            function(aFirstId, aBOOL, aInt, aInteger, aFloat, aCGFloat, aId)
+            print("aFirstId=" .. tostring(aFirstId))
+            return aFirstId
+        end
+        ):luaBlockWithParamsTypeArray({"id","id", "BOOL", "int", "NSInteger", "float", "CGFloat", "id"})
+  )
+```
+
+也可以使用toblock来简化使用
+```lua
+function toblock(func, paramTypes)
+    if paramTypes == nil then
+        return toobjc(func):luaVoidBlock()
+    else
+        return toobjc(func):luaBlockWithParamsTypeArray(paramTypes)
+    end
+end
+
+local res = self:testReturnIdWithFirstIdBlock(
+    toblock(
+        function(aFirstId, aBOOL, aInt, aInteger, aFloat, aCGFloat, aId)
+            print("lua aFirstInt")
+            return "123"
+        end
+        , {"id", "id", "BOOL", "int", "NSInteger" , "float" , "CGFloat" , "id" })
+    )
+```
+通过toblock的实现可以知道，Lua将OC Block分为了两类，一类是返回值和参数都是void的情况，另外一类是有返回值或者参数的，wax通过luaVoidBlock和luaBlockWithParamsTypeArray两个函数来实现了lua函数转为OC block。
+
+# wax实践实例
+```lua
+function toblock(func, paramTypes)
+    if paramTypes == nil then
+        return toobjc(func):luaVoidBlock()
+    else
+        return toobjc(func):luaBlockWithParamsTypeArray(paramTypes)
+    end
+end
+
+waxClass{ "AFWCouponViewController", ASViewController, nil }
+
+function viewWillAppear( self, animated )
+    self.super:viewWillAppear(animated)
+
+    local rpcManager = AFWPromoRpcManager:sharedManager()
+
+    local weakSelf = self
+    rpcManager:fetchActivityListWithPosition_OnSuccess_onFailure(0,
+      toblock(
+        function()
+          local modelManager = AFWPromoModelManager:sharedInstance()
+          local activityListModel = modelManager:promoActivityListModel()
+          local hasMore = false
+          local listCount = 0
+
+          if activityListModel ~= nil then
+            hasMore = activityListModel:hasMore()
+            local listArray = activityListModel:array()
+            if listArray ~= nil then
+              listCount = toobjc(listArray):count()
+            end
+          end
+
+          local tableView = toobjc(weakSelf:getIvarObject("_tableView"))
+          if hasMore then 
+            tableView:setShowsInfiniteScrolling(true);
+
+          elseif listCount then
+            tableView:setShowsInfiniteScrolling(true);
+            local infiniteScrollingView = tableView:infiniteScrollingView()
+            infiniteScrollingView:markAllLoaded();
+          end
+
+        end
+      ),
+      nil
+    )
+end
+```
+
+
+# wax使用要点记录
++ waxClass的函数，第一个参数必须是self
++ 调用OC方法的时候，都用冒号 ":"，或者使用点号，但需要自己将第一个参数带上
+UIApplication:sharedApplication() <=> UIApplication.sharedApplication(UIApplication)
++ wax自动将NSString，NSArray，NSDictionary以及NSNumber转化成lua的值，如果想要调用这些类的OC方法，必须要先使用toobjc转成objc对象
++ 使用getIvarObject来获取实例对象变量
++ lua在管道式调用的时候可能出现问题，需要注意
++ 使用local weakSelf = self来防止循环引用
+
+
+# wax相关参考文献
+## Lua中数据结构详解系列
++ [TValue](http://blog.aliyun.com/761?spm=0.0.0.0.ZZGi63)
++ [TString](http://blog.aliyun.com/768?spm=0.0.0.0.76dcVz)
++ [Table](http://blog.aliyun.com/787?spm=0.0.0.0.GJPlNM)
++ [Closure](http://blog.aliyun.com/845?spm=0.0.0.0.qrzUYC)
++ [Udata](http://blog.aliyun.com/789?spm=0.0.0.0.KYTykx)
++ [Lua_State](http://blog.aliyun.com/795?spm=0.0.0.0.l1YbIa)
+
+## Lua教程
++ [Programming in Lua](http://www.lua.org/pil/4.3.1.html)
+
+## wax官网
++ [alibaba wax](https://github.com/alibaba/wax)
+
+
+
