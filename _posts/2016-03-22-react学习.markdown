@@ -1,0 +1,147 @@
+---
+layout: post
+title: React学习
+date: 2016.03.22
+categories: js react
+---
+
+# 什么是React
+React首先是一个js库，然后才是一个构建UI的js库，又名React.js、ReactJS。React的出现主要是为了解决一个问题：创建数据持续变化的大型的应用。React不同于世面上的大部分MVC框架，大部分开发者只将其用作MVC中的V部分，而React最大的作用也就是在于创建 **可以重用的，能实时反应数据变化的UI组件** 。
+
+在最近几年，渐渐热门一种编程模式是响应式编程[Reactive programming](https://en.wikipedia.org/wiki/Reactive_programming), 响应式编程解决的最大问题就是当数据变化的时候，UI能根据数据变化自动更新。AngularJS, MeteorJS等框架就是响应式编程的实践者。而React相比而言更像是他们的进化版。
+
+为了实现React的既定目标，React做了非常多有意义的尝试。
+首先，React选择了相比于html更加灵活强大的javascript作为UI组件的编写语言，javascript相比于html有着更为强大的抽象能力。React还创造了JSX语法，方便组件的编写。
+
+其次，正如Pete Hunt说的，相比于AngularJS的数据绑定方式，React更像是游戏引擎，React每一帧都会对屏幕进行清空然后重绘，而传统的数据绑定，组件是一直存在的。Pete Hunt还为这两种模式创造了两个词， **React是immediate-mode renderer，而数据绑定是retained mode** 。基于这种思想，React创造了Virtual DOM，即在内存中创造数据结构的缓存，然后当数据变化的时候，得出数据结构的变化，然后快速更新DOM。而这些对使用者来说都是透明的，使用者只要刷新刷新，整个页面就会更新，其中的优化全部由React接管。
+
+另外，React还有一些非常有意思的设计思想，比如组件的嵌套，比如单向数据流动，以及后来出现并火爆的React-Native等都非常值得深入研究。
+
+总之，React中饱含着facebook工程师和大量开发者的智慧，可能还代表着未来webapp的发展方向，怎么能够不先睹为快呢?
+
+对于React历史感兴趣的同学还可以阅读下facebook前端工程师Christopher Chedeau的文章，[JavaScript’s History and How it Led To ReactJS](http://thenewstack.io/javascripts-history-and-how-it-led-to-reactjs/)。
+
+是不是有同学已经迫不及待想一睹React芳容了呢？下面我们就来一步一步搭建React的开发框架，对于非前端开发工程师来说，这一部分还是挺麻烦的，有不少工具和概念需要了解。不过工欲善其事，必先利其器，了解了这些工具，对于我们以后的开发和调试，都有非常大的好处。好了，废话不多说，进入正题。
+
+# 环境搭建
+前端的环境搭建真的是一件比较痛苦而又舒爽的工作，为了不一下子把大家搞死，咱们先搭一个最简环境。什么？我不想浪费时间搭环境，我就想看看怎么用？那请移步访问[react-starter-kit](https://github.com/kriasoft/react-starter-kit);
+
+## 最简环境
+首先我们需要使用到npm，javascript的包管理工具，`npm init`主要是为了创建package.json文件，该文件用来管理依赖的各种包信息。
+```shell
+npm init
+```
+
+接下去安装react和react-dom包，这两个包就是React框架，必须安装的。
+```shell
+npm install --save react
+npm install --save react-dom
+```
+执行完毕之后，我们可以发现package.json文件中的dependencies中多了两项依赖。
+```shell
+"dependencies": {
+    "react": "^0.14.7",
+    "react-dom": "^0.14.7"
+}
+```
+
+为了方便开发调试，接下来我们安装webpack，webpack是一个资源打包工具包，为什么选择webpack，这是一个很深奥的问题，附上两个链接，希望能帮你解惑，[如何使用webpack](https://github.com/petehunt/webpack-howto),[How Instagram.com Works](https://www.youtube.com/watch?v=VkTCL6Nqm6Y)。为啥这里是--save-dev呢，因为这个只需要开发调试的时候使用，真正上线的时候是不用的，npm真是贴心。
+```shell
+npm install --save-dev webpack
+```
+
+另外我们还需要启动一个本地server来方便调试，这里既然选择了webpack，就使用webpack的server了，-g 表示全局安装。
+```shell
+npm install webpack-dev-server -g
+```
+
+其实上面的配置走完了以后，就可以写基本的React应用了，但是，EcmaScript 6标准太好用了[ES6学习](http://es6.ruanyifeng.com/)，我们还是麻烦一下装一个javascript的编译器，babel，方便我们将es6的代码转换成es5，以便在老的浏览器上奔跑。我们可以看下babel的口号：Use next generation JavaScript, today.
+```shell
+npm install --save-dev babel-loader
+npm install --save-dev babel-core
+npm install --save-dev babel-preset-es2015
+npm install --save-dev babel-preset-react
+```
+
+最后，为了让webpack来管理打包以及转换一类的工作，我们还需要webpack.config.js这个文件，是webpack的配置文件，注意这里配置文件要根据实际情况来调整。
+```js
+var path = require('path');
+var webpack = require('webpack');
+ 
+module.exports = {
+  entry: './main.js',
+  output: { path: __dirname, filename: 'bundle.js' },
+  module: {
+    loaders: [
+      {
+        test: /.jsx?$/,
+        loader: 'babel-loader',
+        exclude: /node_modules/,
+        query: {
+          presets: ['es2015', 'react']
+        }
+      }
+    ]
+  },
+};
+```
+
+迫不及待了，赶紧试一下。
+创建如下几个文件
+index.html
+```html
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Hello React</title>
+  </head>
+  <body>
+    <div id="hello"></div>
+    <script src="bundle.js"></script>
+  </body>
+</html>
+```
+
+main.js
+```js
+import Hello from './hello.jsx';
+```
+
+hello.jsx
+```js
+import React from 'react';
+import ReactDOM from 'react-dom';
+ 
+class Hello extends React.Component {
+  render() {
+    return <h1>Hello</h1>
+  }
+}
+ 
+ReactDOM.render(<Hello/>, document.getElementById('hello'));
+```
+
+整理的目录结构如下：
+```
+- index.html
+- main.js
+- hello.jsx
+- webpack.config.js
+- package.json
+- node_modules/
+```
+
+一切准备就绪之后，执行`webpack-dev-server --progress --colors`，webpack执行成功之后，在浏览器输入http://localhost:8080/。
+Amazing， isn't it！
+
+这样咱们的最简环境算是搞完了，现在就可以做一些修改，写一些demo，刷新页面之后就能看见效果了。对于我们这种懒都已经进入骨髓的人来说，这样就够了么？能不能把手动刷新也干掉呢？实时显示变化？
+
+
+# 参考文献
++ [wikipedia](https://en.wikipedia.org/wiki/React_(JavaScript_library))
++ [Why did we build React?](https://facebook.github.io/react/blog/2013/06/05/why-react.html)
++ [React: Making faster, smoother UIs for data-driven Web apps](http://www.infoworld.com/article/2608181/javascript/react--making-faster--smoother-uis-for-data-driven-web-apps.html)
++ [Thinking in React](http://facebook.github.io/react/docs/thinking-in-react.html)
++ [Setting up React for ES6 with Webpack and Babel](https://www.twilio.com/blog/2015/08/setting-up-react-for-es6-with-webpack-and-babel-2.html)
++ [react and webpack](http://www.infoq.com/cn/articles/react-and-webpack)
