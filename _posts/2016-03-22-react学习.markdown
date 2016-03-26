@@ -26,7 +26,7 @@ React首先是一个js库，然后才是一个构建UI的js库，又名React.js�
 # 环境搭建
 前端的环境搭建真的是一件比较痛苦而又舒爽的工作，为了不一下子把大家搞死，咱们先搭一个最简环境。什么？我不想浪费时间搭环境，我就想看看怎么用？那请移步访问[react-starter-kit](https://github.com/kriasoft/react-starter-kit);
 
-## 最简环境
+
 首先我们需要使用到npm，javascript的包管理工具，`npm init`主要是为了创建package.json文件，该文件用来管理依赖的各种包信息。
 ```shell
 npm init
@@ -105,7 +105,12 @@ index.html
 
 main.js
 ```js
+import React from 'react';
+import ReactDOM from 'react-dom';
 import Hello from './hello.jsx';
+
+ReactDOM.render(<Hello/>, document.getElementById('hello'));
+
 ```
 
 hello.jsx
@@ -118,8 +123,8 @@ class Hello extends React.Component {
     return <h1>Hello</h1>
   }
 }
- 
-ReactDOM.render(<Hello/>, document.getElementById('hello'));
+
+module.exports = Hello;
 ```
 
 整理的目录结构如下：
@@ -135,8 +140,40 @@ ReactDOM.render(<Hello/>, document.getElementById('hello'));
 一切准备就绪之后，执行`webpack-dev-server --progress --colors`，webpack执行成功之后，在浏览器输入http://localhost:8080/。
 Amazing， isn't it！
 
-这样咱们的最简环境算是搞完了，现在就可以做一些修改，写一些demo，刷新页面之后就能看见效果了。对于我们这种懒都已经进入骨髓的人来说，这样就够了么？能不能把手动刷新也干掉呢？实时显示变化？
+这样咱们的开发环境基本算是搞完了，现在就可以做一些修改，写一些demo，刷新页面之后就能看见效果了。对于我们这种懒都已经进入骨髓的人来说，这样就够了么？能不能把手动刷新也干掉呢？实时显示变化？当然可以，[react-hot-loader](http://gaearon.github.io/react-hot-loader/getstarted/)就能实现我们想要的一切。具体的配置可以参考[react-hot-boilerlate](https://github.com/gaearon/react-hot-boilerplate)，在这里配置的时候遇到了一点点小坑，当loader只有一个的时候，query可以单独是一个kv队，而当loaders是一个数组的时候，必须要将query参数用？跟在loader后面，具体可以参考[webpack query-parameters](http://webpack.github.io/docs/using-loaders.html#query-parameters)，完整的配置信息如下：
+```shell
+var path = require('path');
+var webpack = require('webpack');
 
+module.exports = {
+  entry: ['webpack-dev-server/client?http://0.0.0.0:3000', // WebpackDevServer host and port
+    'webpack/hot/only-dev-server', // "only" prevents reload on syntax errors
+    './main.js'
+  ],
+  output: {
+    path: __dirname,
+    filename: 'bundle.js'
+  },
+  module: {
+    loaders: [{
+      test: /.jsx?$/,
+      loaders: ['react-hot', 'babel-loader?presets[]=react,presets[]=es2015'],
+      exclude: /node_modules/,
+    }]
+  },
+  plugins: [
+    new webpack.HotModuleReplacementPlugin()
+  ],
+  resolve: {
+        extensions: ['', '.js', '.jsx']
+  }
+};
+```
+需要注意的是，react-hot-loader只有在被export的对象中修改render方法才会生效，这是和React的机制保持吻合的。好啦，环境搭建完成后，就可以享受React时光了。
+
+其实React并没有限制应用者使用各种各样的js工具，看看大神们都为我们准备了哪些工具，请点击[Complementary-Tools](https://github.com/facebook/react/wiki/Complementary-Tools)，请自便。
+
+# Virtual DOM && Data Flow && props vs state && JSX
 
 # 参考文献
 + [wikipedia](https://en.wikipedia.org/wiki/React_(JavaScript_library))
