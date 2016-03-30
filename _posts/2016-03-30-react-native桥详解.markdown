@@ -17,6 +17,7 @@ RN框架有三个主要的线程，他们分别是：
 4. 每个NativeModules默认都有自己的queue
 
 源码中的应用分别举个例子
+
 1、shadow queue
 ```objective-c
 - (void)setIntrinsicContentSize:(CGSize)size forView:(UIView *)view
@@ -104,6 +105,7 @@ RN框架有三个主要的线程，他们分别是：
 如果想要让js能成功调用native，那就要先讲native modules进行export。具体的export可以参考[这里](http://facebook.github.io/react-native/docs/native-modules-ios.html#content)。
 
 export的时候有两个非常重要的宏定义：
+
 1. RCT_EXPORT_MODULE(js_name): 导出模块
 2. RCT_EXPORT_METHOD(method): 到处模块中的方法
 
@@ -116,6 +118,7 @@ RCT_EXTERN void RCTRegisterModule(Class); \
 + (void)load { RCTRegisterModule(self); }
 ```
 可以发现，通过这个宏，我们实现了两个函数。
+
 + 一个是moduleName，返回的是我们指定暴露给js的名字js_name，如果不指定的话，默认是module的类名。
 + 一个是load方法，我们都知道load方法在app启动的时候就会调用，所以，当我们export module之后，app一起来就会将自己注册，由框架统一暴露js。
 
@@ -152,6 +155,7 @@ RCT_EXPORT_METHOD(greet:(NSString *)name)
 ```
 
 export之后，RN是怎么用的呢？下面就详细的解析一下整个过程。
+
 1. 在`application:didFinishLaunchingWithOptions:`中创建一个bridge
 2. 创建bridge会自己创建一个batchedBridge，并且start自己
 3. start的会调用`initModulesWithDispatchGroup`初始化所有之前注册的模块
