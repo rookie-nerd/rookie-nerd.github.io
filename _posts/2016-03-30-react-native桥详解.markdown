@@ -10,6 +10,7 @@ categories: js react-native
 
 # 线程们
 RN框架有三个主要的线程，他们分别是：
+
 1. shadow queue: 专门用来布局的queue
 2. main thread: 主线程，用于UI展示
 3. javascript thread: 专门用来执行JS代码的线程
