@@ -42,7 +42,7 @@ GCD提供了**3**种不同的队列:
 	- 不用等待前面的任务完成，可以尽可能多的开始任务执行
 	- GCD提供了4中全局并发队列
 	- 用户自定义并发队列
-{% highlight objective-c %}
+{% highlight smalltalk %}
 // GCD提供的4中全局并发队列
  #define DISPATCH_QUEUE_PRIORITY_HIGH        2
  #define DISPATCH_QUEUE_PRIORITY_DEFAULT     0
@@ -52,7 +52,7 @@ GCD提供了**3**种不同的队列:
 dispatch_queue_t aQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 {% endhighlight %}
 
-{% highlight objective-c %}
+{% highlight smalltalk %}
 // 用户自定义并发队列
 // OS X v10.7 and later or iOS 4.3 and later
  #define DISPATCH_QUEUE_SERIAL 

@@ -1,14 +1,36 @@
 # Site settings
 title: Rookie-nerd's Tech Notes
-email: fragno12@gmail.com
-description: > # this means to ignore newlines until "baseurl:"
-  Every veteran comes from rookie
-baseurl: "" # the subpath of your site, e.g. /blog/
-url: "http://rookie-nerd.github.io" # the base hostname & protocol for your site
-github_username:  fragno
-
-# Build settings
+url: "http://rookie-nerd.github.io"
 markdown: kramdown
-
 kramdown:
   input: GFM
+  syntax_highlighter: rouge
+lsi: false
+exclude: [LICENSE, CNAME, README.md, .gitignore]
+
+# Theme customization - please change from the defaults!
+theme:
+  # Color for top bar, links, etc
+  highlight_color: '#3498db'
+
+  # Profile links on the left sidebar, leave blank to ignore
+  social:
+    github: fragno
+    #stackexchange: 348619
+    #stackoverflow: 348619
+    twitter: fragno
+    #facebook: zuck
+    #tumblr: animalygifs
+    #linkedin: philipjagielski
+    #gplus: 110552447039675960964
+
+  # "Hi, I'm _______"
+  name: fragno
+  email: fragno12@gmail.com
+  tagline: "Every veteran comes from rookie"
+
+  # Google Analytics key, leave blank to ignore
+  google_analytics_key:
+  google_analytics_domain:
+  # Toggle "Postings are my own" disclaimer in footer
+  show_disclaimer: true
