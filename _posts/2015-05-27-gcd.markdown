@@ -2,7 +2,7 @@
 layout: post
 title:  GCD技术详解
 date:   2015-05-27 16:14:43
-categories: objective-c
+categories: OC
 ---
 
 # 背景介绍
@@ -66,14 +66,14 @@ queue = dispatch_queue_create("com.example.MyQueue", DISPATCH_QUEUE_CONCURRENT);
 	- 任务按照他们被加入队列的顺序执行
 	- 每次只能执行一个任务，只有上一个任务完成了，下一个任务才能开始
 
-{% highlight objective-c %}
+{% highlight smalltalk %}
 // 用户自定义串行队列
 // OS X v10.7 before or iOS 4.3 before
 dispatch_queue_t queue;
 queue = dispatch_queue_create("com.example.MyQueue", NULL);
 {% endhighlight %}
 
-{% highlight objective-c %}
+{% highlight smalltalk %}
 // 用户自定义串行队列
 // OS X v10.7 and later or iOS 4.3 and later
  #define DISPATCH_QUEUE_SERIAL 
@@ -85,7 +85,7 @@ queue = dispatch_queue_create("com.example.MyQueue", DISPATCH_QUEUE_SERIAL);
 
 ## Dispatch groups
 dispatch groups提供了一种同步机制，可以实现某个任务的执行依赖于其他任务的完成。
-{% highlight objective-c %}
+{% highlight smalltalk %}
 dispatch_queue_t queue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 dispatch_group_t group = dispatch_group_create();
 
@@ -125,7 +125,7 @@ dispatch source是一种基本的数据类型，GCD支持以下类型的dispatch
 下面用于记录gcd各种实用的使用
 
 + singleton
-{% highlight objective-c %}
+{% highlight smalltalk %}
 + (instancetype)sharedInstance
 {
     static dispatch_once_t once;
@@ -138,7 +138,7 @@ dispatch source是一种基本的数据类型，GCD支持以下类型的dispatch
 {% endhighlight %}
 
 + 保护资源
-{% highlight objective-c %}
+{% highlight smalltalk %}
 - (void)setCount: (NSUInteger)count forKey:(NSString *)key
 {
 	key = [key copy];
@@ -165,7 +165,7 @@ dispatch source是一种基本的数据类型，GCD支持以下类型的dispatch
 这样self.count就不会有并发问题了。self.isolationQueue是串行queue
 
 + 一个资源，多读少写
-{% highlight objective-c %}
+{% highlight smalltalk %}
 // 创建并发queue
 self.isolationQueue = dispatch_queue_create([label UTF8String], DISPATCH_QUEUE_CONCURRENT);
 
