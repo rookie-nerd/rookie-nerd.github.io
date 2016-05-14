@@ -268,6 +268,7 @@ a
 这个middleware的名字是redux-thunk。该middleware允许你向Dispatcher传递action函数，而不仅仅是action对象。如果你需要的仅仅是同步的action的话，那么你应该让action函数返回一个action对象。但是如果你需要处理异步的东西的话，你可以写好处理函数，然后使用dispatcher派发另外的结果action。
 
 例如，就拿API来说，一般请求会有成功和失败两种情况，可以根据请求成功还是失败，返回不同的action对象。例子如下：
+
 ```js
 import request from 'axios';
 
