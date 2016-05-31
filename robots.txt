@@ -1,5 +1,0 @@
-Sitemap: http://fragno.github.com/sitemap.xml
-
-User-agent: *
-Disallow: /assets/images/
-Disallow: /resume/

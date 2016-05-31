@@ -1,22 +1,22 @@
 ---
 layout: default
-title: blog, notes, and book writeups.
 ---
 
-<div id="home">
-  <h2><i class="fa fa-bookmark"></i> Blog Posts</h2>
-  <ul id="blog-posts" class="posts">
+<div class="home">
+  <ul class="post-list">
     {% for post in site.posts %}
-      {% unless post.categories contains 'tutorial' %}
-        <li><span>{{ post.date | date_to_string }} &raquo;</span><a class="post-link" href="{{ post.url }}">{{ post.title }}</a></li>
-      {% endunless %}
-    {% endfor %}
-  </ul>
-
-  <h2><i class="fa fa-pagelines"></i> Tutorial</h2>
-  <ul id="tutorial-posts" class="posts">
-    {% for post in site.categories.tutorial %}
-      <li><span>{{ post.date | date_to_string }} &raquo;</span><a class="post-link" href="{{ post.url }}">{{ post.title }}</a></li>
+      <li>
+        <br>
+        <h3>
+          <a class="post-link" href="{{ post.url | prepend: site.baseurl }}">{{ post.title }}</a>
+        </h3>
+        <span class="post-meta">{{ post.date | date: "%b %-d, %Y %H:%m" }}</span>
+        <hr id="line">
+		<div class="content">
+		{{ post.excerpt }}
+        </div>
+		<br>
+      </li>
     {% endfor %}
   </ul>
 </div>
