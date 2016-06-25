@@ -25,4 +25,26 @@ React可能是现在前端开发中最炙手可热的UI框架了。在React的[�
 
 + Declarative(声明式)
 + Component-Based（组件化）
-+ Learn Once, Write AnyWhere（一学多写）
++ Learn Once, Write AnyWhere（一学多写）Vue.js是用来构建交互式web界面的，其主要的关注点和React是一样的，都是立足于View层。Vue.js最核心的部分是两个Reactive Data Binding以及Composable View Components。
+
+## 响应式数据绑定
+Vue.js将界面开发分成了三个部分，分别是View、ViewModel和Model，这种划分在客户端开发看来是非常合理的，也经过了实际的检验。以HelloWorld为例来说明，示例来源[Vue.js Guide](https://vuejs.org/guide/)。
+
+```js
+<!-- this is our View -->
+<div id="example-1">
+  Hello {{ name }}!
+</div>
+
+<!-- this is our Model -->
+var exampleData = {
+  name: 'Vue.js'
+}
+
+<!-- this is our ViewModel -->
+var exampleVM = new Vue({
+  el: '#example-1',
+  data: exampleData
+})
+```
+这就是经典的MVVM模式，Vue.js通过极简的API，将数据和视图绑定在一起，也就是所谓的Data-Binding，这样，当数据变化的时候，界面就能变化，实现了数据驱动的响应式变成。
