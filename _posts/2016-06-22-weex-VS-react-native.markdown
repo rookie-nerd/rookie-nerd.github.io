@@ -6,6 +6,16 @@ categories: js react-native weex
 ---
 
 # 前言
+weex的思想是多个平台，只写一套代码，而react-native的思想是多个平台可以写多套代码，但其使用的是同一套语言框架。
+
+进一步浏览weex和react-native的代码之后，可以得出如下的公式。
+
+```
+weex = Vue.js + H5/Native
+react-native = React + Native
+```
+
+总的来说，其差异性表现在如下表格。
 
 |dimension    |weex                     |react-native                  |
 |-------------|-------------------------|------------------------------|
@@ -13,6 +23,32 @@ categories: js react-native weex
 |principle    | write once, run anywhere| learn once, write anywhere   |
 
 个人观点，weex和react-native最核心的区别就是这两个。然而就只这两个维度的同步，导致了weex和react-native完全不一样的发展方向，下面就这两个不同进行进一步分析。
+
+## Vue.js vs React
+
+|维度|Vue.js|React|
+|---|---|---|
+|定位|UI框架|UI框架|
+|使用平台|Web|多平台|
+|架构|MVVM|React|
+|数据流|数据绑定|单向数据流动|
+|组件系统|有|有|
+|响应式|是|否|
+|开发模式|模块分离|all in js|
+|flexbox|支持|支持|
+
+## weex vs react-native
+
+|维度|weex|react-native|
+|---|---|---|
+|思想|write once, run anywhere| learn once, write anywhere|
+|扩展|为了保证各平台的一致性，一次扩展得在各个平台都实现|不同平台可自由扩展|
+|调式|暂时log调试|有专门的调试工具，chrome调试，较为完善|
+|社区|内测开源|15年3月开源，社区非常活跃|
+|支持|alibaba支持|facebook支持|
+|组件丰富程度|基本只有自带的10余中|除了自带的，还有js.coach上社区贡献的，还是比较丰富的|
+|外围框架|基于Vue.js的外围框架|基于React的外围框架|
+|上手难度|容易|困难|
 
 # Vue.js
 Vue.js虽然是Evan You个人开发的开源项目，其社区活跃度以及代码质量还是值得一提的。在写此文章之际，Vue.js在Github上的Star达到了21099，Fork达到了2186。虽然相比于react的Star数44108，Fork数7610还有一定距离，但考虑到作为个人开发者能有如此多的人关注参与，该框架的优秀程度恐怕不会低于React。
@@ -173,12 +209,6 @@ React背后是强大的facebook在开发维护，其目的不是要简单的创�
 不敢说这样的想法一定能成功，但就现在的发展势头来看，机会还是非常大的。尤其对于开发者来说极具吸引力，如果这一想法成为现实，以后React就可能像DOM一样成为业界统一的标准。那对于iOS开发者来说，在Android上面开发会跟在iOS上开发一样，不需要学习全新的Java语言，Android系统，更不要说各种Java特有的艰深复杂的工具了。
 
 # Native
-初步浏览weex和react-native的代码之后，可以得出如下的公式。
-
-```js
-weex = Vue.js + H5/Native
-react-native = React + Native
-```
 
 个人感觉weex和react-native最大的不同是在Vue.js和React层面。这一点在react-native的命名上就非常容易看出来。在react-native刚出来的时候，其和React的关系是react-native依赖React。
 
