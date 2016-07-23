@@ -5,6 +5,8 @@ date: 2016.03.22
 categories: js react-native
 ---
 
+直入主题怎么搞React Native。
+
 # 如何创建Helloworld
 请查阅google，或者本人上一篇blog
 

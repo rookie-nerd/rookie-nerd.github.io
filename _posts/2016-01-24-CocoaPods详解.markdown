@@ -5,6 +5,8 @@ date: 2016.01.24
 categories: objective-c
 ---
 
+阅读CocoaPods源码的一点点注释。
+
 # CocoaPods简介
 相信写过iOS程序的同学们都应该就接触过CocoaPods的，他就是iOS界的Maven，帮助开发者们管理着程序依赖的第三方framework乃至自己拆分出来的framework。通过简单的在Podfile中配置项目的依赖，CocoaPods将自动递归地寻找依赖，获取源码并创建工程。cocoaPods的使用是非常直观的，本文主要不介绍CocoaPods的使用，而是简单的探寻其背后的原理和实现。
 

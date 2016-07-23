@@ -5,7 +5,6 @@ date: 2016.07.20
 categories: js react
 ---
 
-# 前言
 该文是[Mixins Considered Harmful](https://facebook.github.io/react/blog/2016/07/13/mixins-considered-harmful.html)的译文，原作者 Dan Abramov
 
 # 概述

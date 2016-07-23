@@ -5,6 +5,8 @@ date: 2016.03.07
 categories: lua objective-c
 ---
 
+使用wax的时候关于block的一点点思考。
+
 # wax简介
 [wax](https://github.com/alibaba/wax)
 

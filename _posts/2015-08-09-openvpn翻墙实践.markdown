@@ -5,6 +5,8 @@ date: 2015-09-08 09:41:14
 categories: tools
 ---
 
+openvpn配置实践总结。
+
 # 原理
 vpn的全称叫virtual private network，虚拟专用网络，即利用公网架设专用网络。vpn的作用就是当外地员工想要访问内网资源的时候，外地员工可以通过连接vpn server，然后访问内网资源[vpn原理](http://baike.baidu.com/link?url=1xZna2Iapi4-RWKsx7DhxdVq7wXzZ8TW5_jbxVxZnGhj_P2nR-T6vGzkp94y605_qyfUD5bMvisdSvuT2ASD9seNLDHRS_w9a3Knnw9HIW_pEwaWY6RknWHUjnWYr6Jm)。
 

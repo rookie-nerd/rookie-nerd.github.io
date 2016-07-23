@@ -4,6 +4,7 @@ title: objc源码解析
 date: 2015.12.20
 categories: objective-c
 ---
+objc的源码解析。
 
 # AutoreleasePoolPage
 [黑幕背后的AutoreleasePool](http://blog.sunnyxx.com/2014/10/15/behind-autorelease/)

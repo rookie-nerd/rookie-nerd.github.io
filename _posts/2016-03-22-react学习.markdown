@@ -5,7 +5,6 @@ date: 2016.03.22
 categories: js react
 ---
 
-# 什么是React
 React首先是一个js库，然后才是一个构建UI的js库，又名React.js、ReactJS。React的出现主要是为了解决一个问题：创建数据持续变化的大型的应用。React不同于世面上的大部分MVC框架，大部分开发者只将其用作MVC中的V部分，而React最大的作用也就是在于创建 **可以重用的，能实时反应数据变化的UI组件** 。
 
 在最近几年，渐渐热门一种编程模式是响应式编程[Reactive programming](https://en.wikipedia.org/wiki/Reactive_programming), 响应式编程解决的最大问题就是当数据变化的时候，UI能根据数据变化自动更新。AngularJS, MeteorJS等框架就是响应式编程的实践者。而React相比而言更像是他们的进化版。

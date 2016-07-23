@@ -5,7 +5,6 @@ date: 2016.03.30
 categories: js react-native
 ---
 
-# 前言
 该文主要是对[Tadeu Bridging In React Native](http://tadeuzagallo.com/blog/react-native-bridge/)的翻译。结合代码做了一定的分析。
 
 # 线程们

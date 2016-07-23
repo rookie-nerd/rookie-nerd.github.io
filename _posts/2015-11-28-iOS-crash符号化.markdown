@@ -5,6 +5,8 @@ date: 2015.11.28
 categories: objective-c
 ---
 
+iOS crash符号化。
+
 # crashLog相关介绍
 正急需解crash的小伙伴可以直接跳到章节[crashlog符号化实战](#crashPractice)。
 
