@@ -5,6 +5,8 @@ date:   2015-05-27 16:14:43
 categories: objective-c
 ---
 
+GCD技术详解
+
 # 背景介绍
 
 ## 并发简介
