@@ -7,10 +7,17 @@ categories: linux shell svn
 
 常用的各种命令的集合
 
-#shell
+# git
+```sh
+# log
+git log --since=2016-07-23 --pretty=format:"%s %cn %cd" --no-merges --date=short
+#output: D:[压后台不去掉授权登录页] xxx 2016-07-27
+```
+
+# shell
 
 ## 按照特定的格式获取当前时间 [Reference:date](http://man7.org/linux/man-pages/man1/date.1.html)
-{% highlight sh %}
+```sh
 #linux
 date +"%Y-%m-%d %H:%M:%S"
 #output: 2015-06-02 14:45:53
@@ -18,31 +25,29 @@ date +"%Y-%m-%d %H:%M:%S"
 #mac
 date -r 1426163387 +"%Y-%m-%d"
 #output: 2015-03-12
-{% endhighlight %}
+```
 
 
 ## 在命令行打开相应的程序
-{% highlight sh %}
+```sh
 #mac
 open .  # 使用finder打开当前目录
 open -a Xcode *.xcodeproj # 使用特定的程序打开文件
-
-{% endhighlight %}
+```
 
 
 ## 流编辑器，sed
-{% highlight sh %}
+```sh
 #linux
 sed -i 's/old_link/new_link/g' *
 
 #mac
 sed -i '.original' 's/old_link/new_link/g' * 	// -i 后面必须指定备份的后缀名
 sed -i '' 's/old_link/new_link/g' *				// -i 后面如果是空的话，表明忽略后缀名
-{% endhighlight %}
+```
 
 # svn
-
-{% highlight sh %}
+```sh
 # 获取全部的ignore列表
 svn pg -R svn:ignore .
 
@@ -56,4 +61,4 @@ svn changelist sub sub.c sub.h
 svn cl --remove sub.c
 svn diff --cl sub
 svn ci --changelist sub -m "sub"
-{% endhighlight %}
+```
