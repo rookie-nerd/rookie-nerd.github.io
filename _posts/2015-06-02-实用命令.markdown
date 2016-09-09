@@ -12,6 +12,9 @@ categories: linux shell svn
 # log
 git log --since=2016-07-23 --pretty=format:"%s %cn %cd" --no-merges --date=short
 #output: D:[压后台不去掉授权登录页] xxx 2016-07-27
+
+# clean local refs
+git fetch origin --prune
 ```
 
 # shell

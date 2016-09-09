@@ -55,6 +55,9 @@ xcrun --sdk iphoneos9.0 --find clang
 xcodebuild用于构建Xcode工程中的一个或者多个target，或者构建Xcode工程或者workspace中的scheme
 ```shell
 xcodebuild -project MyProject.xcodeproj -target Target1 -target Target2 -configuration Debug
+
+# 查看Xcode支持的变量定义，可以用在ruby中
+xcodebuild -project xxx.xcodeproj -target "xxx" -showBuildSettings
 ```
 
 ## xcode-select
