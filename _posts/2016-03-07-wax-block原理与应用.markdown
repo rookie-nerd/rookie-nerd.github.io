@@ -102,7 +102,7 @@ iOS的开发者都应该知道Block是Obejctive-C对象，其就是混合着数�
 
 下面就是block的示例：
 
-+ OC代码：
+OC代码：
 
 ```smalltalk
      [self testReturnIdWithFirstIdBlock:^id(id aFirstId, char *aCharPointer, char aChar, short aShort, int aInt, long long aLongLong, float aFloat, double aDouble, bool aBool, NSString *aString, id aId) {
