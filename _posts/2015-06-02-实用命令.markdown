@@ -2,7 +2,7 @@
 layout: post
 title: "实用命令"
 date:  2015-06-02 14:45:53
-categories: linux shell svn
+categories: linux shell svn cheatsheet
 ---
 
 常用的各种命令的集合
