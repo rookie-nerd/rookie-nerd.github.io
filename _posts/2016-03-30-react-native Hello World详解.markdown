@@ -193,6 +193,7 @@ RCT_CUSTOM_VIEW_PROPERTY(fontSize, CGFloat, RCTTextView)
 这些都是更加基础的问题，建议有精力的同学可以阅读更多的文章，阅读源码，深入研究下。
 
 # js端技术解析
+
 ## 鬼-react-native
 
 ## 鬼-Component
