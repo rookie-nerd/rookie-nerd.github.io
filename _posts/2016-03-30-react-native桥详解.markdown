@@ -19,7 +19,7 @@ RN框架有三个主要的线程，他们分别是：
 
 1、shadow queue
 
-```objective-c
+```smalltalk
 - (void)setIntrinsicContentSize:(CGSize)size forView:(UIView *)view
 {
   RCTAssertMainThread();
@@ -50,7 +50,7 @@ RN框架有三个主要的线程，他们分别是：
 
 3、jsThread
 
-```objective-c
+```smalltalk
 // 所有的js代码都是通过这个函数来实现的
 - (void)executeBlockOnJavaScriptQueue:(dispatch_block_t)block
 {
@@ -66,7 +66,7 @@ RN框架有三个主要的线程，他们分别是：
 ```
 4、NativeModules queue
 
-```objective-c
+```smalltalk
 // 大部分module的在export的时候都会实现RCTBridgeModule协议中的这个
 - (dispatch_queue_t)methodQueue
 {
@@ -117,7 +117,7 @@ export的时候有两个非常重要的宏定义：
 先看下实现
 1. RCT_EXPORT_MODULE
 
-```objective-c
+```smalltalk
 #define RCT_EXPORT_MODULE(js_name) \
 RCT_EXTERN void RCTRegisterModule(Class); \
 + (NSString *)moduleName { return @#js_name; } \
@@ -132,7 +132,7 @@ RCT_EXTERN void RCTRegisterModule(Class); \
 
 2. RCT_EXPORT_METHOD
 
-```objective-c
+```smalltalk
 #define RCT_EXPORT_METHOD(method) \
   RCT_REMAP_METHOD(, method)
 
@@ -149,7 +149,7 @@ RCT_EXTERN void RCTRegisterModule(Class); \
 ```
 可以发现，当调用RCT_EXPORT_METHOD的时候，其实其是创建了一个函数，该函数以`"__rct_export__"`开头，返回的是一个数组，第一个元素是js_name，第二个元素是method。举个例子。
 
-```objective-c
+```smalltalk
 RCT_EXPORT_METHOD(greet:(NSString *)name)
 {
   NSLog(@"Hi, %@!", name);
@@ -175,7 +175,7 @@ export之后，RN是怎么用的呢？下面就详细的解析一下整个过程
 
 下面，我们看一下核心的代码。
 
-```objective-c
+```smalltalk
 // 1 
 // AppDelegate.m
 - (BOOL)application:(__unused UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
