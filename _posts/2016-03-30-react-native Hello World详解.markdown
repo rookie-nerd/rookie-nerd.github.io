@@ -13,7 +13,7 @@ categories: js react-native
 # Hello World
 因为react native不仅包括js，还包括native，这里我们需要将他们分开来看。首先看native，打开HelloWorld工程。我们可以发现代码结构非常简单，除了多了一个Libraries，和我们全新创建一个SinglePage Application也没有什么大的区别。展开Libraries，我们可以看到一堆工程，正式因为这些工程的存在，才使得js和native之间的交互成为可能。
 
-```objective-c
+```smalltalk
 // 该工程是React Native的核心工程，实现了js和native之间桥的功能
 // 实现了布局、模块以及大量的基础UI等。
 // 该工程下的代码体现了fb工程师的大量智慧，值得深入研究
@@ -51,7 +51,7 @@ RCTWebSocket
 
 然后我们看看AppDelegate的中的不一样的地方。
 
-```objective-c
+```smalltalk
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions
 {
   NSURL *jsCodeLocation;
@@ -149,7 +149,8 @@ RCTRootView有点类似Native的window，其被用来作为React管理的views�
 ## 鬼-RCTTextView
 React的架构是支持component扩展的，这也是必须的，RCTTextView就是react native自带的View扩展之一，非常基本，正好借此机会学习下如何扩展View，增加js的能力。
 一般ui扩展都是通过继承RCTViewManager来实现的，而RCTTextView是通过RCTTextViewManager来实现扩展的。下面简单看一下RCTTextViewmanager的代码。
-```objective-c
+
+```smalltalk
 // RCTTextViewManager.h
 @interface RCTTextViewManager : RCTViewManager
 @end
@@ -182,11 +183,13 @@ RCT_CUSTOM_VIEW_PROPERTY(fontSize, CGFloat, RCTTextView)
 最后，RCT_REMAP_VIEW_PROPERTY()、RCT_EXPORT_VIEW_PROPERTY()、RCT_CUSTOM_VIEW_PROPERTY()等宏实现属性暴露给js
 
 这里有很多技术细节，比如
+
 + RCT_EXPORT_MODULE()的原理是什么？
 + 什么是Module，为啥要暴露Module给js呢？原理是什么呢？
 + RCT_REMAP_VIEW_PROPERTY()、RCT_EXPORT_VIEW_PROPERTY()等是怎么实现的？
 + RCT_EXPORT_SHADOW_PROPERTY()为啥还有Shadow?
 + Native和js函数之间的参数是如何转换的呢？
+
 这些都是更加基础的问题，建议有精力的同学可以阅读更多的文章，阅读源码，深入研究下。
 
 # js端技术解析
