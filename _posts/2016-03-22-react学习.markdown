@@ -27,16 +27,19 @@ React首先是一个js库，然后才是一个构建UI的js库，又名React.js�
 
 
 首先我们需要使用到npm，javascript的包管理工具，`npm init`主要是为了创建package.json文件，该文件用来管理依赖的各种包信息。
+
 ```shell
 npm init
 ```
 
 接下去安装react和react-dom包，这两个包就是React框架，必须安装的。
+
 ```shell
 npm install --save react
 npm install --save react-dom
 ```
 执行完毕之后，我们可以发现package.json文件中的dependencies中多了两项依赖。
+
 ```shell
 "dependencies": {
     "react": "^0.14.7",
@@ -45,16 +48,19 @@ npm install --save react-dom
 ```
 
 为了方便开发调试，接下来我们安装webpack，webpack是一个资源打包工具包，为什么选择webpack，这是一个很深奥的问题，附上两个链接，希望能帮你解惑，[如何使用webpack](https://github.com/petehunt/webpack-howto),[How Instagram.com Works](https://www.youtube.com/watch?v=VkTCL6Nqm6Y)。为啥这里是--save-dev呢，因为这个只需要开发调试的时候使用，真正上线的时候是不用的，npm真是贴心。
+
 ```shell
 npm install --save-dev webpack
 ```
 
 另外我们还需要启动一个本地server来方便调试，这里既然选择了webpack，就使用webpack的server了，-g 表示全局安装。
+
 ```shell
 npm install webpack-dev-server -g
 ```
 
 其实上面的配置走完了以后，就可以写基本的React应用了，但是，EcmaScript 6标准太好用了[ES6学习](http://es6.ruanyifeng.com/)，我们还是麻烦一下装一个javascript的编译器，babel，方便我们将es6的代码转换成es5，以便在老的浏览器上奔跑。我们可以看下babel的口号：Use next generation JavaScript, today.
+
 ```shell
 npm install --save-dev babel-loader
 npm install --save-dev babel-core
@@ -63,6 +69,7 @@ npm install --save-dev babel-preset-react
 ```
 
 最后，为了让webpack来管理打包以及转换一类的工作，我们还需要webpack.config.js这个文件，是webpack的配置文件，注意这里配置文件要根据实际情况来调整。
+
 ```js
 var path = require('path');
 var webpack = require('webpack');
@@ -87,7 +94,10 @@ module.exports = {
 
 迫不及待了，赶紧试一下。
 创建如下几个文件
-index.html
+
+
++ index.html
+
 ```html
 <!doctype html>
 <html>
@@ -102,7 +112,8 @@ index.html
 </html>
 ```
 
-main.js
++ main.js
+
 ```js
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -112,7 +123,8 @@ ReactDOM.render(<Hello/>, document.getElementById('hello'));
 
 ```
 
-hello.jsx
++ hello.jsx
+
 ```js
 import React from 'react';
 import ReactDOM from 'react-dom';
@@ -127,6 +139,7 @@ module.exports = Hello;
 ```
 
 整理的目录结构如下：
+
 ```
 - index.html
 - main.js
@@ -140,6 +153,7 @@ module.exports = Hello;
 Amazing， isn't it！
 
 这样咱们的开发环境基本算是搞完了，现在就可以做一些修改，写一些demo，刷新页面之后就能看见效果了。对于我们这种懒都已经进入骨髓的人来说，这样就够了么？能不能把手动刷新也干掉呢？实时显示变化？当然可以，[react-hot-loader](http://gaearon.github.io/react-hot-loader/getstarted/)就能实现我们想要的一切。具体的配置可以参考[react-hot-boilerlate](https://github.com/gaearon/react-hot-boilerplate)，在这里配置的时候遇到了一点点小坑，当loader只有一个的时候，query可以单独是一个kv队，而当loaders是一个数组的时候，必须要将query参数用？跟在loader后面，具体可以参考[webpack query-parameters](http://webpack.github.io/docs/using-loaders.html#query-parameters)，完整的配置信息如下：
+
 ```shell
 var path = require('path');
 var webpack = require('webpack');
