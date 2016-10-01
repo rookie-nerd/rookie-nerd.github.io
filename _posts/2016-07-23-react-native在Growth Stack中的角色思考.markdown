@@ -2,7 +2,7 @@
 layout: post
 title: react native在Growth Stack中的角色思考
 date: 2016.07.23
-categories: react-native growth-stack
+categories: react-native product
 ---
 
 Growth Hacker在国内外的互联网界近几年都是比较火热的词，互联网巨头Facebook也许是践行Growth Hacker最好的公司。然而概念吵的火并不等于做的好，如何落地Growth Hacker其实是一件比较困难的事情。最近从twitter上挖到一篇文章，推荐了[MobileGrowthStack](http://www.mobilegrowthstack.com/the-mobile-growth-stack/)，该文章维护着关于做Growth Stack的框架，为想要落地Growth Hacker的公司提供帮助。其最主要的输出应该就是下面这样图。

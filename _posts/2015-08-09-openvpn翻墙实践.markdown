@@ -2,7 +2,7 @@
 layout: post
 title: openvpn翻墙实践
 date: 2015-09-08 09:41:14
-categories: tools
+categories: vpn
 ---
 
 openvpn配置实践总结。

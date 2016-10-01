@@ -2,7 +2,7 @@
 layout: post
 title: CocoaPods详解
 date: 2016.01.24
-categories: objective-c
+categories: ios cocoapods
 ---
 
 阅读CocoaPods源码的一点点注释。

@@ -2,7 +2,7 @@
 layout: post
 title: wax block原理与应用
 date: 2016.03.07
-categories: lua objective-c
+categories: lua ios
 ---
 
 使用wax的时候关于block的一点点思考。

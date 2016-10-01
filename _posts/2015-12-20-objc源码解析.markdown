@@ -2,7 +2,7 @@
 layout: post
 title: objc源码解析
 date: 2015.12.20
-categories: objective-c
+categories: ios
 ---
 objc的源码解析。
 

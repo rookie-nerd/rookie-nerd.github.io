@@ -2,7 +2,7 @@
 layout: post
 title: iOS crash符号化
 date: 2015.11.28
-categories: objective-c
+categories: ios
 ---
 
 iOS crash符号化。
