@@ -18,6 +18,7 @@ RN框架有三个主要的线程，他们分别是：
 源码中的应用分别举个例子
 
 1、shadow queue
+
 ```objective-c
 - (void)setIntrinsicContentSize:(CGSize)size forView:(UIView *)view
 {
@@ -41,12 +42,14 @@ RN框架有三个主要的线程，他们分别是：
     // 进行真正的渲染
   [self _layoutAndMount];
 }
+
 ```
 
 2、main thread
 这就不举例了，写过iOS的同学应该知道主线程的作用。
 
 3、jsThread
+
 ```objective-c
 // 所有的js代码都是通过这个函数来实现的
 - (void)executeBlockOnJavaScriptQueue:(dispatch_block_t)block
@@ -59,8 +62,10 @@ RN框架有三个主要的线程，他们分别是：
     block();
   }
 }
+
 ```
 4、NativeModules queue
+
 ```objective-c
 // 大部分module的在export的时候都会实现RCTBridgeModule协议中的这个
 - (dispatch_queue_t)methodQueue
@@ -98,6 +103,7 @@ RN框架有三个主要的线程，他们分别是：
     }
   }
 }
+
 ```
 
 # Native Modules
@@ -110,11 +116,13 @@ export的时候有两个非常重要的宏定义：
 
 先看下实现
 1. RCT_EXPORT_MODULE
+
 ```objective-c
 #define RCT_EXPORT_MODULE(js_name) \
 RCT_EXTERN void RCTRegisterModule(Class); \
 + (NSString *)moduleName { return @#js_name; } \
 + (void)load { RCTRegisterModule(self); }
+
 ```
 可以发现，通过这个宏，我们实现了两个函数。
 
@@ -123,6 +131,7 @@ RCT_EXTERN void RCTRegisterModule(Class); \
 
 
 2. RCT_EXPORT_METHOD
+
 ```objective-c
 #define RCT_EXPORT_METHOD(method) \
   RCT_REMAP_METHOD(, method)
@@ -136,8 +145,10 @@ RCT_EXTERN void RCTRegisterModule(Class); \
     RCT_CONCAT(js_name, RCT_CONCAT(__LINE__, __COUNTER__))) { \
     return @[@#js_name, @#method]; \
   }
+
 ```
 可以发现，当调用RCT_EXPORT_METHOD的时候，其实其是创建了一个函数，该函数以`"__rct_export__"`开头，返回的是一个数组，第一个元素是js_name，第二个元素是method。举个例子。
+
 ```objective-c
 RCT_EXPORT_METHOD(greet:(NSString *)name)
 {
@@ -151,6 +162,7 @@ RCT_EXPORT_METHOD(greet:(NSString *)name)
 {
   return @[ @"", @"greet:(NSString *)name" ];
 }
+
 ```
 
 export之后，RN是怎么用的呢？下面就详细的解析一下整个过程。
@@ -162,6 +174,7 @@ export之后，RN是怎么用的呢？下面就详细的解析一下整个过程
 5. 然后通过使用`injectJSONConfiguration:`将配置注入js供js调用（注意这里config不一定是在这里注入的，也可以按需注入)
 
 下面，我们看一下核心的代码。
+
 ```objective-c
 // 1 
 // AppDelegate.m
@@ -256,6 +269,7 @@ export之后，RN是怎么用的呢？下面就详细的解析一下整个过程
                   asGlobalObjectNamed:@"__fbBatchedBridgeConfig"
                              callback:onComplete];
 }
+
 ```
 
 
