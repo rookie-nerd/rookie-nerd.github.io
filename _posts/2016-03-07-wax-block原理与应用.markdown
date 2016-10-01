@@ -17,7 +17,7 @@ wax是Lua和Objective-C之间的桥梁。wax的目标是可以让你直接使用
 
 下面我们来看看wax是怎么样使用运行时来创建一个OC类的
 
-```Objective-C
+```smalltalk
 // 创建新的Objective-C类
 static int __call(lua_State *L) {   
     const char *className = luaL_checkstring(L, 2);
@@ -101,14 +101,16 @@ static id allocWithZone(id self, SEL _cmd, NSZone *zone) {
 iOS的开发者都应该知道Block是Obejctive-C对象，其就是混合着数据和行为的OC对象，也就是我们平时所说的闭包。而在Lua中，OC的block其实就是特殊的wax函数，可以通过toblock来实现转换。[wax block](https://github.com/alibaba/wax/wiki/Block)
 
 下面就是block的示例：
- OC代码：
 
- ```Objective-C
++ OC代码：
+
+```smalltalk
      [self testReturnIdWithFirstIdBlock:^id(id aFirstId, char *aCharPointer, char aChar, short aShort, int aInt, long long aLongLong, float aFloat, double aDouble, bool aBool, NSString *aString, id aId) {
         NSLog(@"aFirstId=%@", aFirstId);
         return @"123";
      }];
 ```
+
 对应的Lua代码:
 
 ```lua
