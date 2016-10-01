@@ -1,6 +1,6 @@
 ---
 layout: post
-title: React Native学习
+title: React Native Hello World详解
 date: 2016.03.22
 categories: js react-native
 ---
