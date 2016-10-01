@@ -9,7 +9,7 @@ lsi: false
 exclude: [LICENSE, CNAME, README.md, .gitignore]
 
 # Theme customization - please change from the defaults!
-theme:
+style:
   # Color for top bar, links, etc
   highlight_color: '#3498db'
 
