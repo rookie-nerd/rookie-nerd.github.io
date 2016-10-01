@@ -15,6 +15,7 @@ React Native是下一代的React，是用React的思想来实现Native App的开
 这里开发环境以iOS为例，首先你的电脑上必须要安装有node和watchman，而且Xcode必须是7.0以上的版本。
 [watchman](https://facebook.github.io/watchman/)就是盯梢男，是专门帮react native观察文件的变更的，当文件发生变化的时候，其就会记录变化，并执行相应的操作，等我们环境搭建完成之后，我们在修改js的时候，就可以看到terminal中会有相应的编译信息输出，这就是watchman在帮忙编译。
 安装node和watchman的脚本
+
 ```shell
 brew install node
 brew install watchman
@@ -23,14 +24,17 @@ brew install watchman
 React Native是已两个npm包发布的，这两个包分别是react-native-cli和react-native。前者是轻量级的命令行工具，而后者才是真正的React Native框架代码。
 
 所以有命令行工具好用，感觉世界会变得很美好。执行一下命令安装工具。
+
 ```shell
 npm install -g react-native-cli
 ```
 这样我就有了我们所需要的命令了，紧接创建我们自己的工程。
+
 ```shell
 react-native init xxxProject
 ```
 安装会有点慢，安装完了之后该怎么执行呢？还是要靠react-native-cli,react-native-cli的全部命令如下：
+
 ```shell
   - start: 开启webserver
   - bundle: 构建js bundle离线包
@@ -43,6 +47,7 @@ react-native init xxxProject
   - upgrade: 升级框架
 ```
 聪明的你肯定一眼就看出来应该执行啥了，没错，就是如下命令。
+
 ```shell
 react-native run-ios
 ```
