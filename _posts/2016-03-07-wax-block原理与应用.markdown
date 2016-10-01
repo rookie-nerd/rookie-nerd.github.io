@@ -16,6 +16,7 @@ wax是Lua和Objective-C之间的桥梁。wax的目标是可以让你直接使用
 其实wax的定位非常明确，就是作为Lua和Objective-C之间的桥梁，而这个桥梁的核心基础，就是Runtime，也就是运行时。wax其实就是Objective-C和Lua之间的翻译官，在APP刚启动的时候会加载Lua脚本，wax会解析并运行Lua脚本，通过Runtime改变app运行。
 
 下面我们来看看wax是怎么样使用运行时来创建一个OC类的
+
 ```Objective-C
 // 创建新的Objective-C类
 static int __call(lua_State *L) {   
@@ -101,6 +102,7 @@ iOS的开发者都应该知道Block是Obejctive-C对象，其就是混合着数�
 
 下面就是block的示例：
  OC代码：
+
  ```Objective-C
      [self testReturnIdWithFirstIdBlock:^id(id aFirstId, char *aCharPointer, char aChar, short aShort, int aInt, long long aLongLong, float aFloat, double aDouble, bool aBool, NSString *aString, id aId) {
         NSLog(@"aFirstId=%@", aFirstId);
@@ -108,6 +110,7 @@ iOS的开发者都应该知道Block是Obejctive-C对象，其就是混合着数�
      }];
 ```
 对应的Lua代码:
+
 ```lua
   self:testReturnIdWithFirstIdBlock(
         toobjc(
@@ -120,6 +123,7 @@ iOS的开发者都应该知道Block是Obejctive-C对象，其就是混合着数�
 ```
 
 也可以使用toblock来简化使用
+
 ```lua
 function toblock(func, paramTypes)
     if paramTypes == nil then
@@ -141,6 +145,7 @@ local res = self:testReturnIdWithFirstIdBlock(
 通过toblock的实现可以知道，Lua将OC Block分为了两类，一类是返回值和参数都是void的情况，另外一类是有返回值或者参数的，wax通过luaVoidBlock和luaBlockWithParamsTypeArray两个函数来实现了lua函数转为OC block。
 
 # wax实践实例
+
 ```lua
 function toblock(func, paramTypes)
     if paramTypes == nil then
