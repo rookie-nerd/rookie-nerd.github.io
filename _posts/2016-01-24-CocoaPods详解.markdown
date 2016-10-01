@@ -44,6 +44,7 @@ scheme定义了一组需要构建的targets，以及构建时需要的配置和�
 
 ## xcrun
 xcrun可以用来定位Xcode的开发者工具，也可以用来调用Xcode的开发者工具
+
 ```shell
 xcrun --sdk iphoneos9.0 --find clang
 
@@ -53,6 +54,7 @@ xcrun --sdk iphoneos9.0 --find clang
 
 ## xcodebuild
 xcodebuild用于构建Xcode工程中的一个或者多个target，或者构建Xcode工程或者workspace中的scheme
+
 ```shell
 xcodebuild -project MyProject.xcodeproj -target Target1 -target Target2 -configuration Debug
 
@@ -62,6 +64,7 @@ xcodebuild -project xxx.xcodeproj -target "xxx" -showBuildSettings
 
 ## xcode-select
 xcode-select控制xcrun、xcodebuild、cc以及其他xcode和BSD开发工具的developer目录，他使得不同版本xcode工具之间的切换变得简单。
+
 ```shell
 xcode-select --switch /Applications/Xcode.app/Contents/Developer
 ```
@@ -75,6 +78,7 @@ xcodeproj是ruby写的用来创建和修改xcode工程的工具。
 前面讲了那么多准备知识，对于理解cocoapods的源码还是非常有用的。下面我们正式进入cocoapods的源码解析。[CocoaPods源码地址](https://github.com/CocoaPods/CocoaPods)
 
 CocoaPods的源码结构为:
+
 ```
 CocoaPods
     - bin        : pod和sandbox-pod命令目录
@@ -97,6 +101,7 @@ CocoaPods
 以上的目录结构，主要是按照模块功能划分的，总体来看分的还是比较清晰的。
 
 下面简单来看看cocoapods.rb文件
+
 ```ruby
   # 用于存储target相关的信息，整合pods下target的信息
   autoload :AggregateTarget,           'cocoapods/target/aggregate_target'
@@ -144,6 +149,7 @@ CocoaPods
 
 ## Installer
 首先我们来看看，当我们执行pod install的时候，到底是干了什么.
+
 ```ruby
 def install!
   prepare  # 做一些准备工作
@@ -160,6 +166,7 @@ end
 ```
 
 我们使用cocoaPods的时候写的podfile就会在解析依赖关系的时候被使用到。其核心代码如下：
+
 ```ruby
 def resolve_dependencies
   analyzer = create_analyzer # 创建分析器
@@ -180,6 +187,7 @@ end
 ```
 
 接下来看看如何将下载下来的依赖库整合进目标工程。也就是generate_pods_project函数
+
 ```ruby
 def generate_pods_project
   UI.section 'Generating Pods project' do
@@ -208,6 +216,7 @@ end
 
 ## Command
 pod提供了一系列命令行，供用户使用。
+
 ```shell
 Usage:
 
@@ -242,6 +251,7 @@ Options:
     --help       Show help banner of specified command
 ```
 这些命令绝大部分都在cocoapods/command目录下。其实现基本是一样的，下面简单的拿pod install 来作为示例解析。执行pod install --help可以看到如下输出
+
 ```shell
 Usage:
 
@@ -274,6 +284,7 @@ Options:
     --help                              Show help banner of specified command
 ```
 cocoapods中所有的command都是继承自[CLAide::Command](https://github.com/CocoaPods/CLAide), CLAide是是ruby下的命令行工具，其提供了参数解析和命令执行功能。
+
 ```ruby
 module Project
   module Options
