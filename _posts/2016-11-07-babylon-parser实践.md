@@ -240,6 +240,7 @@ babylon解析之后的AST的节点类型是基于[ESTree](https://github.com/est
   }
 }
 ```
+
 ### NullLiteral
 
 ```js
@@ -681,6 +682,7 @@ babylon解析之后的AST的节点类型是基于[ESTree](https://github.com/est
 ```
 
 ## Expressions
+
 ### Super
 
 ```js
@@ -1209,27 +1211,53 @@ babylon解析之后的AST的节点类型是基于[ESTree](https://github.com/est
 
 ### Imports
 
-```js
-```
-
 #### ImportDeclaration
 
 ```js
+// import { cube, foo } from 'my-module';
+
+{
+  "type": "ImportDeclaration",
+  "specifiers": [],
+  "importKind": "value",
+  "source": {}
+}
 ```
 
 #### ImportSpecifier
 
 ```js
+// import { cube, foo } from 'my-module';
+
+{
+  "type": "ImportSpecifier",
+  "imported": {},
+  "local": {}
+}
+
 ```
 
 #### ImportDefaultSpecifier
 
 ```js
+// import myDefault from "my-module";
+
+{
+  "type": "ImportDefaultSpecifier",
+  "local": {}
+}
+
 ```
 
 #### ImportNamespaceSpecifier
 
 ```js
+// import * as myModule from "my-module";
+
+{
+  "type": "ImportNamespaceSpecifier",
+  "local": {}
+}
 ```
 
 ### Exports
@@ -1237,19 +1265,49 @@ babylon解析之后的AST的节点类型是基于[ESTree](https://github.com/est
 #### ExportNamedDeclaration
 
 ```js
+// export { myFunction }
+
+{
+  "type": "ExportNamedDeclaration",
+  "declaration": null,
+  "specifiers": [],
+  "source": null,
+  "exportKind": "value"
+}
 ```
 
 #### ExportSpecifier
 
 ```js
+// export { myFunction }
+
+{
+  "type": "ExportSpecifier",
+  "local": {},
+  "exported": {}
+}
+
 ```
 
 #### ExportDefaultDeclaration
 
 ```js
+// export default { myFunction };
+
+{
+  "type": "ExportDefaultDeclaration",
+  "declaration": {}
+}
+
 ```
 
 #### ExportAllDeclaration
 
 ```js
+// export * from "my-module";
+
+{
+  "type": "ExportAllDeclaration",
+  "source": {}
+}
 ```
