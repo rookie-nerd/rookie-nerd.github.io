@@ -5,7 +5,6 @@ date: 2016-09-16
 categories: react-native
 ---
 
-# 背景
 最近升级了react-native框架，从0.19.0升到了0.32.0，改动还是挺大的，包括react和react-native的分离，以及巨量的特性更新和性能优化。本文主要为了说明0.32.0版本发送事件使用说明。
 
 # old fashion
