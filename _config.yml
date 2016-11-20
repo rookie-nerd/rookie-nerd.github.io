@@ -1,10 +1,11 @@
 # Site settings
 title: Rookie-nerd's Tech Notes
 url: "http://rookie-nerd.github.io"
-markdown: kramdown
-kramdown:
+markdown: redcarpet
+redcarpet:
   input: GFM
   syntax_highlighter: rouge
+  extensions: [with_toc_data]
 lsi: false
 exclude: [LICENSE, CNAME, README.md, .gitignore]
 

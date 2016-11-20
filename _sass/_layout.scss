@@ -197,3 +197,13 @@ li {
     color: white;
     cursor: pointer;
 }
+
+#toc {
+    position: fixed;
+    right: 50px;
+    max-height: 500px;
+    width: 250px;
+    background: #F0F8FF;
+    overflow: scroll;
+    font-size: 8px;
+}
