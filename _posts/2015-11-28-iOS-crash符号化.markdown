@@ -8,7 +8,7 @@ categories: ios
 iOS crash符号化。
 
 # crashLog相关介绍
-正急需解crash的小伙伴可以直接跳到章节[crashlog符号化实战](#crashlog符号化实战)。
+正急需解crash的小伙伴可以直接跳到章节[crashlog符号化实战](#crashlog-1)。
 
 作为iOS开发工程师，不遇到crash是不可能，而造成crash的原因又是多种多样，包括但不限于读写错误地址，执行非法指令，越权访问等等。一般系统在crash的会记录crash时的线程栈，方便开发者查明crash的原因。
 
