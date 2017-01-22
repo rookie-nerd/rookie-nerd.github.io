@@ -139,11 +139,13 @@ hello.cpp                              hello.o                                  
 光说不练假把式，那我们继续已上面的hello为例，说明其中的关系。按照下面的步骤进行我们的试验。
 
 1、以debug模式编译包
+
 ```C++
 g++ -g hello.cpp           // 生成a.out可执行文件和a.out.dSYM符号表文件
 ```
 
 使用nm看a.out的符号表。([nm工具](https://sourceware.org/binutils/docs-2.17/binutils/nm.html#nm))
+
 ```asm
 0000000100001e0c s GCC_except_table2
 0000000100001e4c s GCC_except_table3
@@ -181,12 +183,14 @@ g++ -g hello.cpp           // 生成a.out可执行文件和a.out.dSYM符号表�
 ```
 
 2、使用strip移除符号
+
 ```C++
 cp a.out a.stripped.out         // 拷贝a.out，使用strip生成符号表被缩减过的二进制文件
 strip a.stripped.out
 ```
 
 使用nm查看a.stripped.out符号表
+
 ```asm
                  U __Unwind_Resume
                  U __ZNKSt3__16locale9use_facetERNS0_2idE
@@ -248,6 +252,7 @@ image lookup -a 0xfa0                               #比如我们要查看000000
 有符号表可以直接使用lldb调试器来进行crash的符号化，而需要的文件也就只是二进制和crash文件。就本文开头的crash文件为例。
 
 就解如下12、13行。
+
 ```asm
 Thread 18 Crashed:
 0   libsystem_kernel.dylib          0x36432df0 __pthread_kill + 8
@@ -308,15 +313,19 @@ image lookup -a 1184530
 
 + 查看crash log的UUID： Binary Images下的UUID
 + 使用dwarfdump查看binary package的UUID
+
 ```shell
 dwarfdump --uuid SampleApp.app/SampleApp
 ```
 
 + 查看.dSYM的UUID
+
 ```shell
 dwarfdump --uuid SampleApp.app.dSYM
 ```
+
 三者的uuid一致的话，就说明准备完毕了，然后将他们放在一个目录下，目录结构如下
+
 ```shell
 ls ./
 
@@ -328,6 +337,7 @@ ls ./
 
 全部准备工作完毕以后，就可以直接使用xcode提供的工具来符号化了。
 1、**推荐用法symbolicatecrash**
+
 ```shell
  # 一般symbolicatecrash 都在此目录下，如果不在的话，可以尝试在/Applications目录下搜索 find ./ -name symbolicatecrash 
 /Applications/Xcode.app/Contents/SharedFrameworks/DTDeviceKitBase.framework/Versions/A/Resources/symbolicatecrash -v SampleApp.crash 2> symbolicatecrash.log
@@ -337,6 +347,7 @@ ls ./
 ```
 
 2、**atos** ([atos man page](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man1/atos.1.html))
+
 ```shell
 xcrun atos -o SampleApp.app.dSYM/Contents/Resources/DWARF/SampleApp -l 0x29000 -arch armv7        # 这些参数都可以在crashlog文件的二进制文件部分获得
 
