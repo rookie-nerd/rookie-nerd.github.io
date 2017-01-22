@@ -15,7 +15,7 @@ iOS crash符号化。
 系统在app crash的时候会生成crash log，crash log在真机上的位置一般为：**/private/var/mobile/Library/Logs/CrashReporter/**。
 如下是一个实际的crashlog。[crashLog结构解析](http://www.raywenderlich.com/23704/demystifying-ios-application-crash-logs)
 
-```asm
+```
 // 1: 进程信息
 Incident Identifier: 1AB014C6-C27B-41A6-A776-ADEEE093BDBC           // 唯一的ID用来标识该crash
 CrashReporter Key:   017e3ec4eb64f18c3e59100a9656b01232afa7d4       // 映射到设备标识的唯一key，如果你发现所有的crash都来自于相同或者相当少的key，那就不必太担心
@@ -146,7 +146,7 @@ g++ -g hello.cpp           // 生成a.out可执行文件和a.out.dSYM符号表�
 
 使用nm看a.out的符号表。([nm工具](https://sourceware.org/binutils/docs-2.17/binutils/nm.html#nm))
 
-```asm
+```
 0000000100001e0c s GCC_except_table2
 0000000100001e4c s GCC_except_table3
 0000000100001efc s GCC_except_table5
@@ -191,7 +191,7 @@ strip a.stripped.out
 
 使用nm查看a.stripped.out符号表
 
-```asm
+```
                  U __Unwind_Resume
                  U __ZNKSt3__16locale9use_facetERNS0_2idE
                  U __ZNKSt3__18ios_base6getlocEv
@@ -253,7 +253,7 @@ image lookup -a 0xfa0                               #比如我们要查看000000
 
 就解如下12、13行。
 
-```asm
+```
 Thread 18 Crashed:
 0   libsystem_kernel.dylib          0x36432df0 __pthread_kill + 8
 1   libsystem_pthread.dylib         0x364b1cc2 pthread_kill + 58
@@ -271,7 +271,7 @@ Thread 18 Crashed:
 13  SampleApp                        0x0014a312 0x29000 + 1184530
 ```
 
-```asm
+```shell
 target create --no-dependents --arch armv7 SampleApp.app/SampleApp  // 这里arch需要根据crash log中的二进制文件部分查看
  
  # sample output
