@@ -36,7 +36,7 @@ flex container是一个box，其display属性是flex或者inline-flex。flex con
 
 # Flex Containers
 
-```css
+```
 Name: 'display'
 New values: flex | inline-flex
 ```
@@ -80,7 +80,7 @@ Flex Items和inline blocks的表现是一样的，除了flex items是使用order
 ## 隐式的Flex Item的最小大小
 为了得到更为合理的默认flex item最小大小，该规范引进了min-width和min-height的初始化值是auto。
 
-```css
+```
 Name: 'min-width', 'min-height'
 New values: auto
 New initial value: auto
@@ -102,7 +102,7 @@ flex container的内容可以以任何方向，任何顺序布局。这让以前
 
 ## Flex Flow Direction
 
-```css
+```
 Name: 'flex-direction'
 Value: row | row-reverse | column | column-reverse
 Initial: row
@@ -121,7 +121,7 @@ Animation type: 离散
 
 ## Flex Line Wrapping
 
-```css
+```
 Name: flex-wrap
 Value: nowrap | wrap | wrap-reverse
 Initial: nowrap
@@ -141,7 +141,7 @@ Animation type: 离散
 
 ## Flex Direction和Wrap
 
-```css
+```
 Name: flex-flow
 Value: <flex-direction> || <flex-wrap>
 Initial: row nowrap
@@ -158,7 +158,7 @@ flex-flow是flex-direction和flex-wrap的快捷设置方式
 ## Display Order
 Flex items默认是和他们在源码文档中的顺序一样的，使用order属性可以改变这种顺序。
 
-```css
+```
 Name: order
 Value: 整数
 Initial: 0
@@ -184,7 +184,7 @@ flex布局最典型的方面就是其让flex items “flex”的能力，改变�
 
 ## flex
 
-```css
+```
 Name: flex
 Value: none | flex-grow flex-shrink ? || flex-basis
 Inital 1 0 auto
@@ -219,7 +219,7 @@ flex item的Auto margins和block flow的auto margin非常类似
 
 ## Axis Alignment
 
-```css
+```
 Name: justify-content
 Value: flex-start | flex-end | center | space-between | space-around
 Initial: flex-start
@@ -238,14 +238,14 @@ justify-content属性按照当前行的main axis排列flex items。这是在所�
 
 ## Cross-axis Alignment
 
-```css
+```
 Name: align-items
 Value: flex-start | flex-end | center | baseline | stretch
 Initial: stretch
 Applies to: flex containers
 ```
 
-```css
+```
 Name: align-self
 Value: auto | flex-start | flex-end | center | baseline | stretch
 Initial: auto
@@ -267,7 +267,7 @@ Flex items可以沿着cross axis排列，类似justify-content但是是在垂直
 
 ## Packing Flex Lines
 
-```css
+```
 Name: align-content
 Value: flex-start | flex-end | center | space-between | space-around | stretch
 Initial: stretch
