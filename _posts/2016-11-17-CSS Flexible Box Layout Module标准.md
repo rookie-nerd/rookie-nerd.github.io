@@ -2,7 +2,7 @@
 layout: post
 title: CSS Flexible Box Layout Module标准
 date: 2016-11-17
-categories: css, flex
+categories: css flex
 ---
 
 该规范描述了优化之后的CSS box model用于用户界面设计。在flex布局模型中，flex容器的子集能在任何方向上布局，而且能够“flex”他们的大小，要么扩展直到塞满没有被使用的空间，要么收缩防止覆盖其父类。子类的水平和垂直排列都能够轻松的被实现。通过box的嵌套（水平嵌垂直，或者垂直嵌水平）能够用来在两个方向上布局。
