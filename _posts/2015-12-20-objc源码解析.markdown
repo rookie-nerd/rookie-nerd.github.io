@@ -428,7 +428,7 @@ weak_register_no_lock(weak_table_t *weak_table, id referent_id,
 ## self
 细心的开发者可能发现，在类方法和实例方法中，都能使用self，那这两个self有什么不一样呢？
 
-```Objective-c
+```objc
 + (id)self {
     // 类方法的self是指class instance
     return (id)self;
@@ -446,7 +446,7 @@ weak_register_no_lock(weak_table_t *weak_table, id referent_id,
 ## Class && id
 既然说到class，那就聊聊class到底是什么鬼，顺便聊聊常用的id是什么鬼。
 
-```Objective-c
+```objc
 typedef struct objc_class *Class;
 typedef struct objc_object *id;
 
@@ -477,7 +477,7 @@ struct objc_object {
 
 那如何判断一个Class是否是meta Class呢？下面我们就看下`objc-runtime-new.h`下的新的objc_class的定义。
 
-```Objective-c
+```objc
 // 这是新的objc_class对象的定义
 struct objc_class : objc_object {
     // Class ISA;
@@ -515,7 +515,7 @@ struct objc_class : objc_object {
 
 `isMemberOfClass` VS `isKindOfClass`
 
-```Objective-c
+```objc
 // 判断是够是当前类的实例
 - (BOOL)isMemberOfClass:(Class)cls {
     return [self class] == cls;
@@ -532,7 +532,7 @@ struct objc_class : objc_object {
 
 `respondsToSelector`
 
-```Objective-C
+```objc
 // 判断当前对象是否能够响应某个函数
 - (BOOL)respondsToSelector:(SEL)sel {
     if (!sel) return NO;
@@ -594,7 +594,7 @@ static inline old_method * _findMethodInClass(Class cls, SEL sel) {
 
 `conformsToProtocol:`
 
-```Objective-C
+```objc
 // 判断实例能否响应某个protocol
 - (BOOL)conformsToProtocol:(Protocol *)protocol {
     if (!protocol) return NO;
@@ -626,7 +626,7 @@ BOOL protocol_conformsToProtocol(Protocol *self_gen, Protocol *other_gen)
 
 `performSelector:`
 
-```Objective-C
+```objc
 + (id)performSelector:(SEL)sel {
     if (!sel) [self doesNotRecognizeSelector:sel];
     // 其实质就是直接调用C的函数objc_msgSend
