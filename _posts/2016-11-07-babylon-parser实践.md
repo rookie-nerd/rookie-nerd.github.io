@@ -2,7 +2,7 @@
 layout: post
 title: babylon parser实践
 date: 2016-11-07
-categories: js,babel
+categories: js babel
 ---
 
 最近项目需要将一种语法转换到另外一种语法，代码不是我写的，但本着学习的心态阅读了部分代码，主要学习了两个库的使用，一个是[htmlparser2](https://github.com/fb55/htmlparser2)，一个就是[babylon](https://github.com/babel/babylon)。
