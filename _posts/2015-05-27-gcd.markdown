@@ -2,7 +2,7 @@
 layout: post
 title:  GCD技术详解
 date:   2015-05-27 16:14:43
-categories: gcd
+categories: iOS, gcd
 ---
 
 GCD技术详解

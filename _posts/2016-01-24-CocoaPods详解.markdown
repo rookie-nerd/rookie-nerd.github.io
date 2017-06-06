@@ -2,7 +2,7 @@
 layout: post
 title: CocoaPods详解
 date: 2016.01.24
-categories: ios cocoapods
+categories: iOS cocoapods
 ---
 
 阅读CocoaPods源码的一点点注释。
