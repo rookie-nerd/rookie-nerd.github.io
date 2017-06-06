@@ -54,7 +54,7 @@ GCD提供了**3**种不同的队列:
 dispatch_queue_t aQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_DEFAULT, 0);
 {% endhighlight %}
 
-{% highlight smalltalk %}
+{% highlight objective-c %}
 // 用户自定义并发队列
 // OS X v10.7 and later or iOS 4.3 and later
  #define DISPATCH_QUEUE_SERIAL 
@@ -75,7 +75,7 @@ dispatch_queue_t queue;
 queue = dispatch_queue_create("com.example.MyQueue", NULL);
 {% endhighlight %}
 
-{% highlight smalltalk %}
+{% highlight objective-c %}
 // 用户自定义串行队列
 // OS X v10.7 and later or iOS 4.3 and later
  #define DISPATCH_QUEUE_SERIAL 
@@ -84,6 +84,19 @@ queue = dispatch_queue_create("com.example.MyQueue", NULL);
 dispatch_queue_t queue;
 queue = dispatch_queue_create("com.example.MyQueue", DISPATCH_QUEUE_SERIAL);
 {% endhighlight %}
+
+### Root以及预先定义的queues
+在苹果的文档中是“global” queues，libdispatch叫做“root” queue。带有overcommit的队列表示，每当有任务提交的时候，系统都会新开一个线程处理，这样就不会造成某个线程过载（overcommit）
+
+|Index|serial #|queue name|
+|0|4|com.apple.root.low-priority|
+|1|5|com.apple.root.low-overcommit-priority|
+|2|6|com.apple.root.default-priority|
+|3|7|com.apple.root.default-overcommit-priority|
+|4|8|com.apple.root.high-priority|
+|5|9|com.apple.root.high-overcommit-priority|
+|6|10|com.apple.root.background-priority|
+|7|11|com.apple.root.background-overcommit-priority|
 
 ## Dispatch groups
 dispatch groups提供了一种同步机制，可以实现某个任务的执行依赖于其他任务的完成。
