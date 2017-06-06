@@ -2,7 +2,7 @@
 layout: post
 title: VFL详解
 date: 2015-06-04 12:53:58
-categories: ioOS
+categories: iOS
 ---
 
 自己关于布局的一点点思考。
