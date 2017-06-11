@@ -43,7 +43,7 @@ if (IsMarkedAsOffLimits(address)) {
 
 # 如何开启ASan
 一图胜千言。在使用Xcode中开发，可以如下开启ASan。
-![double free——不开启ASan](https://mmbiz.qlogo.cn/mmbiz_png/JZsPaibksczjBXnAAu1oRhicnZQZludlvcc4IMXsgh7qCbt4pEN6nd6EKcZ1PA4qpKtria3Z2M6cvFZvpKfsE4zyA/0?wx_fmt=png)
+![double free——不开启ASan](http://y.photo.qq.com/img?s=nj4LnQMho&l=y.jpg)
 
 另外！
 ASan是LLVM的一个工具，这意味着ASan可以脱离Xcode来跑。ASan能够和Monkey等自动化工具整合，因为一般疑难内存问题都是偶现的，结合自动化，能极大的增强ASan的作用。
@@ -63,10 +63,10 @@ ASan是LLVM的一个工具，这意味着ASan可以脱离Xcode来跑。ASan能�
 ```
 
 下图是没有开启ASan，程序挂掉的场景。
-![double free——不开启ASan](https://mmbiz.qlogo.cn/mmbiz_png/JZsPaibksczjBXnAAu1oRhicnZQZludlvc7gegVb55blibND6I3XkWYgnkzhRgnzlZF4XULOSKR5nicA6uyiax5Ggnw/0?wx_fmt=png)
+![double free——不开启ASan](http://y.photo.qq.com/img?s=6nJHwNpdV&l=y.jpg)
 
 下图是开启ASan，程序挂掉的场景，信息量大大增加，将各种内存分配和释放的堆栈都打出来了，有了这些信息，解决问题的难度就大大下降了。
-![double free——开启ASan](https://mmbiz.qlogo.cn/mmbiz_png/JZsPaibksczjBXnAAu1oRhicnZQZludlvciaLAtn2DYQpceQpIib6CzvialHlkQ1PvQX20LH9A9ib9zpphGt0DoCufWA/0?wx_fmt=png)
+![double free——开启ASan](http://y.photo.qq.com/img?s=K9A6FUxHk&l=y.jpg)
 
 # 参考文档
 1. [apple address sanitizer](https://developer.apple.com/documentation/code_diagnostics/address_sanitizer)
