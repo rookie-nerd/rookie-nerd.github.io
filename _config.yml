@@ -1,6 +1,6 @@
 # Site settings
-title: Rookie-nerd's Tech Notes
-url: "http://rookie-nerd.github.io"
+title: rookie2geek's Tech Notes
+url: "https://www.rookie2geek.cn"
 lsi: false
 exclude: [LICENSE, CNAME, README.md, .gitignore]
 
