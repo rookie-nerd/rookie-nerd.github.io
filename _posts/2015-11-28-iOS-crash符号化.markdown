@@ -5,7 +5,7 @@ date: 2015.11.28
 categories: iOS
 ---
 
-iOS crash符号化。
+> Crash率是App稳定性的重要指标，一定要千方百计得降低crash率。crash的符号化应该成为每一个iOS开发者的必备技能，俗话说得好，不能符号化crash的开发不是好开发。
 
 # crashLog相关介绍
 正急需解crash的小伙伴可以直接跳到章节[crashlog符号化实战](#crashlog-1)。
@@ -219,7 +219,7 @@ strip a.stripped.out
                  U _strlen
                  U dyld_stub_binder
 ```
-仔细观察两者的差别，可以发现strip之后，a.stripped.out文件比a.out笑了，其中很多符号被移除了，比如\_main,GCC_except_table2等。一般正式发布的二进制都会将将符号表strip，以便减少安装包的大小。
+仔细观察两者的差别，可以发现strip之后，a.stripped.out文件比a.out小了，其中很多符号被移除了，比如\_main,GCC_except_table2等。一般正式发布的二进制都会将将符号表strip，以便减少安装包的大小。
 
 3、使用lldb加载二进制([lldb](http://lldb.llvm.org/symbolication.html))
 
@@ -365,17 +365,5 @@ xcrun atos -o SampleApp.app.dSYM/Contents/Resources/DWARF/SampleApp -l 0x29000 -
 
 
 # Further Reading
-+ https://developer.apple.com/library/ios/technotes/tn2151/_index.html
-
-
-
-
-
-
-
-
-
-
-
-
++ [Understanding and Analyzing Application Crash Reports](https://developer.apple.com/library/ios/technotes/tn2151/_index.html)
 

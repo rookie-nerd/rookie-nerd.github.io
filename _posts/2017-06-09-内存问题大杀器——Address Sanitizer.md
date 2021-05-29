@@ -2,7 +2,7 @@
 layout: post
 title: 内存问题大杀器——Address Sanitizer
 date: 2017-06-09
-categories: iOS Xcode
+categories: iOS Xcode QA
 ---
 
 > 内存问题一直是困扰程序员的大问题，内存泄露、内存溢出、内存错误这些疑难杂症能逼疯一箩筐程序员。Address Sanitizer，简称ASan是Xcode自带的内存问题调试工具，原理简单，功效显著。本文主要介绍了ASan的主要功能、基本原理以及最佳实践。
@@ -51,7 +51,7 @@ ASan是LLVM的一个工具，这意味着ASan可以脱离Xcode来跑。ASan能�
 # DEMO
 我们构造了内存重复free的场景，大致看一下开启ASan和不开启ASan的区别。
 
-```objective-c
+```objc
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view, typically from a nib.

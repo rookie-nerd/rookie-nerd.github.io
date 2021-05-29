@@ -38,6 +38,13 @@ open .  # 使用finder打开当前目录
 open -a Xcode *.xcodeproj # 使用特定的程序打开文件
 ```
 
+## 搜索历史命令
+
+```
+#mac 
+# ctl + r 连续按选下一个
+```
+
 
 ## 流编辑器，sed
 ```sh
@@ -64,4 +71,11 @@ svn changelist sub sub.c sub.h
 svn cl --remove sub.c
 svn diff --cl sub
 svn ci --changelist sub -m "sub"
+```
+
+# 端口
+```sh
+lsof -n -i4TCP:$PORT | grep LISTEN
+
+netstat -aln | grep $PORT
 ```
