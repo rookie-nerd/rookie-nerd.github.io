@@ -16,20 +16,20 @@ categories: richtext prosemirror editor
 
 所以一般富文本编辑器都采用如下的架构。![富文本编辑器架构](/img/prosemirror-1.png)
 
-`prosemirror` 也不例外，所以再剖析代码之前，先整体看一下 `prosemirror` 的代码组织结构。
+`prosemirror` 也不例外，所以在剖析代码之前，先整体看一下 `prosemirror` 的代码组织结构。
 
 # 代码结构
 
-`prosemirror` 核心有四个模块，和上述架构是完全对应的上的。
+`prosemirror` 核心有四个模块。
 
 - `prosemirror-model`：定义编辑器的文档模型，用来描述编辑器内容的数据结构。
 - `prosemirror-state`：描述编辑器整体状态，包括文档数据、选择等。
 - `prosemirror-view`：UI组件，用于将编辑器状态展现为可编辑的元素，处理用户交互。
 - `prosemirror-transform`：修改文档的事务方法。
 
-可以发现，`prosemirror` 的核心模块和上述架构是完全对应的上的。因此文章也需要从 `state` 、`view` ， `transform` 三个方面来探索 `prosemirror` 的实现原理。
+可以发现，`prosemirror` 的核心模块和上述架构是完全对应的上的。因此本文就从 `state` 、`view` ， `transform` 三个方面来探索 `prosemirror` 的实现原理。
 
-下面先描述两个典型流程，可以更清晰的达到了解的目标。
+下面先描述两个典型流程，以便更清晰的达到了解的目的。
 
 # 典型流程
 
@@ -71,7 +71,7 @@ let state = EditorState.create({
 })
 ```
 
-# 更新流程
+## 更新流程
 
 当用户在编辑器里面输入一个字符的时候，会触发更新流程。详细的更新流程如下。
 
@@ -79,11 +79,13 @@ let state = EditorState.create({
 
 可以看到输入字符会触发 `view` 变化，继而更新 `state` ，保证 `state` 和 `view` 的一致性。如果我们输入的是自定义的元素，就会在触发 `state` 更新之后，再通过 `updateState` 方法更新 `view`，展示自定义的元素。
 
+可以发现上述流程都和 `state`， `view` 以及 `transform` 紧密相关，下面就结合这两个流程来详细阐述下各层的设计。
+
 # state层
 
 `prosemirror` 的 `state` 并不是固定的，而是可以扩展的，但其有基本的四个属性：`doc` 、 `selection` 、 `storedMarks` 、 `scrollToSelection`。不过其中最核心的应该是 `doc` ，也就是文档结构，里面存放的是文档数据。在初始化流程中，有提到 `DOMParser` 会把初始富文本信息同步到 `doc` 属性中。
 
-每一次编辑都会产生一份新的编辑器数据，如果优化存储，也是比较有意思的话题，不再本文描述。
+每一次编辑都会产生一份新的编辑器数据，如何优化存储，也是比较有意思的话题，不在本文描述。
 
 另外值得提一嘴的是，其 `plugin` 机制也是基于 `state` 来做的。
 
