@@ -84,6 +84,7 @@ let state = EditorState.create({
 # state层
 
 `prosemirror` 的 `state` 并不是固定的，而是可以扩展的，但其有基本的四个属性：`doc` 、 `selection` 、 `storedMarks` 、 `scrollToSelection`。不过其中最核心的应该是 `doc` ，也就是文档结构，里面存放的是文档数据。在初始化流程中，有提到 `DOMParser` 会把初始富文本信息同步到 `doc` 属性中。
+![state 结构](/img/prose_state.png)
 
 每一次编辑都会产生一份新的编辑器数据，如何优化存储，也是比较有意思的话题，不在本文描述。
 
